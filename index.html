@@ -106,7 +106,35 @@ body.lider .hero-in,body.lider .wrap{max-width:820px}
 
 /* código do líder */
 .pin{text-align:center;padding:28px 18px}
-.pwbox{max-width:320px;margin:20px auto 0}
+.pwbox{max-width:320px;margin:18px auto 0;text-align:left}
+.pwbox .lbl{display:block;margin-bottom:6px}
+.pwtag{display:inline-block;margin-top:16px;padding:6px 14px;border-radius:99px;font-size:13px;font-weight:800;background:var(--c);color:var(--cd)}
+.pwload{margin:26px 0 6px;color:var(--mu);font-weight:600;display:flex;flex-direction:column;align-items:center;gap:8px}
+.pwload span{font-size:34px;animation:sway 1.2s infinite}
+.pwmeter{height:5px;border-radius:99px;background:var(--soft);margin-top:8px;overflow:hidden}
+.pwmeter i{display:block;height:100%;width:0;border-radius:99px;transition:all .3s}
+.pwmeter i.r{background:var(--bad)}.pwmeter i.y{background:var(--mid)}.pwmeter i.g{background:var(--ok)}
+.btn:disabled{opacity:.6;cursor:wait}
+.dd{margin-top:4px;text-align:left}
+.ddbtn{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;border:1.5px solid var(--line);background:var(--card);font-size:15.5px;font-weight:700;cursor:pointer;transition:all .2s}
+@media (hover:hover){.ddbtn:hover{border-color:var(--sage)}}
+.dd.open .ddbtn{border-color:var(--sage-d);border-bottom-left-radius:6px;border-bottom-right-radius:6px}
+.ddic{width:34px;height:34px;border-radius:50%;background:var(--sage-t);display:grid;place-items:center;font-size:16px}
+.ddtx{flex:1;text-align:left}
+.chev{font-size:20px;color:var(--mu);transition:transform .25s;line-height:1}
+.dd.open .chev{transform:rotate(180deg)}
+.ddpanel{margin-top:6px;border:1.5px solid var(--sage-d);border-radius:6px 6px 18px 18px;background:var(--card);overflow:hidden;animation:ddin .25s cubic-bezier(.2,.8,.2,1)}
+@keyframes ddin{from{opacity:0;transform:translateY(-6px)}}
+.ddsearch{width:100%;border:0;border-bottom:1px solid var(--line);background:var(--soft);padding:12px 16px;font-size:16px;outline:none}
+.ddlist{max-height:300px;overflow-y:auto;padding:6px}
+.dditem{width:100%;display:flex;align-items:center;gap:12px;padding:9px 10px;border:0;border-radius:14px;background:none;font-size:15px;font-weight:600;cursor:pointer;text-align:left;transition:background .15s}
+.dditem span:nth-child(2){flex:1}
+.dditem .go{color:var(--mu);font-size:18px;opacity:0;transition:opacity .15s}
+@media (hover:hover){.dditem:hover{background:var(--ct)}.dditem:hover .go{opacity:1}}
+.dditem:active{background:var(--ct)}
+.tag.ok{background:var(--sage-t);color:var(--sage-d);border-color:var(--sage)}
+.rst{margin-top:12px;border:1px solid var(--blush);background:var(--blush-t);color:var(--blush-d);border-radius:12px;padding:9px 14px;font-weight:700;font-size:13.5px;cursor:pointer}
+.tddfake{border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:700;font-size:14px;display:flex;justify-content:space-between;color:var(--mu)}
 .pwrow{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:16px;background:var(--soft);transition:border-color .2s}
 .pwrow:focus-within{border-color:var(--sage-d);background:var(--card)}
 .pwrow.bad{border-color:var(--bad);animation:shake .4s}
@@ -353,7 +381,8 @@ const av=s=>`<span class="av ${s.c}">${ini(s.n)}</span>`;
 const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
 
 let sb=null,data={},upd={},lastSave={},ready=false,ok=false,lastUpd=null,lastKey="",cnt={};
-let mode="pick",me=ls.get("sementes_login"),pinTxt="",pickT="Segunda",sel=null,pwErr=false,pwShow=false;
+let sess=null;try{sess=JSON.parse(ls.get("sementes_sessao")||"null")}catch(e){}
+let mode="pick",me=sess&&sess.id||null,pinTxt="",pickT="Segunda",sel=null,pwState="carregando",ddOpen=false,ddQ="",cad=new Set();
 if(ls.get("sementes_lider")==="1")mode="lider";else if(me)mode="aluna";
 let wk=null,pop=-1,party=false;
 let gView="O",refWk=null,fT="Todas",rWk="geral",q="",sO="n",open=null;
@@ -414,7 +443,7 @@ function header(){
   }else if(mode==="aluna"){
     const s=ST.find(x=>x.id===me);
     who.style.display="";who.innerHTML=`${s.n.split(" ")[0]} <span style="color:var(--mu);font-weight:600">· trocar</span>`;
-    who.onclick=()=>{if(!confirm("Trocar de nome neste aparelho?"))return;me=null;ls.del("sementes_login");go("pick")};
+    who.onclick=()=>{if(!confirm("Trocar de nome neste aparelho?"))return;sair()};
   }else who.style.display="none";
 }
 function render(){
@@ -431,40 +460,83 @@ function render(){
 /* ===================== ESCOLHA DE NOME ===================== */
 function renderPick(){
   paint(`<section class="card intro"><div class="sprout">🌱</div><div class="h2">Boas-vindas ao desafio</div>
-  <div class="mu">Escolha sua turma, toque no seu nome e digite sua senha.</div>
+  <div class="mu">Escolha sua turma e selecione seu nome na lista.</div>
   <div class="seg2">${["Segunda","Sábado"].map(t=>`<button data-pt="${t}" class="${t===pickT?"on":""}">Turma de ${t.toLowerCase()}</button>`).join("")}</div>
-  <div class="names">${ST.filter(s=>s.t===pickT).map(s=>`<button class="${s.c}" data-me="${s.id}">${av(s)}<span class="n">${s.n}</span></button>`).join("")}</div></section>
+  <div class="dd ${ddOpen?"open":""}"><button class="ddbtn" id="ddBtn" aria-expanded="${ddOpen}"><span class="ddic">👤</span><span class="ddtx">Selecione seu nome</span><span class="chev">⌄</span></button>
+  ${ddOpen?`<div class="ddpanel"><input id="ddQ" class="ddsearch" placeholder="Digite para buscar..." autocomplete="off"><div class="ddlist" id="ddList"></div></div>`:""}</div></section>
   <button class="leader" id="goLider"><span class="ic">🔐</span><span>Líder do projeto<br><span class="mu" style="font-weight:500">Acesso ao painel de acompanhamento</span></span><span class="arr">›</span></button>
   <button class="manlink" id="pickMan">📘 Primeira vez aqui? Acessar o manual de instrução</button>`,"pick");
   $("pickMan").onclick=()=>openTour();
-  document.querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>{pickT=b.dataset.pt;renderPick()});
-  document.querySelectorAll("[data-me]").forEach(b=>b.onclick=()=>{
-    sel=b.dataset.me;pwErr=false;pwShow=false;go("senha");
-  });
+  document.querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>{pickT=b.dataset.pt;ddOpen=false;ddQ="";renderPick()});
+  $("ddBtn").onclick=()=>{ddOpen=!ddOpen;ddQ="";renderPick();if(ddOpen)setTimeout(()=>{const q=$("ddQ");q&&q.focus({preventScroll:true})},60)};
+  if(ddOpen){$("ddQ").oninput=e=>{ddQ=e.target.value;ddList()};ddList()}
   $("goLider").onclick=()=>{pinTxt="";go("pin")};
 }
 
+function ddList(){
+  const l=ST.filter(s=>s.t===pickT&&norm(s.n).includes(norm(ddQ)));
+  $("ddList").innerHTML=l.length?l.map(s=>`<button class="dditem ${s.c}" data-me="${s.id}">${av(s)}<span>${s.n}</span><span class="go">›</span></button>`).join(""):'<div class="mu" style="padding:12px">Nenhum nome encontrado.</div>';
+  document.querySelectorAll("[data-me]").forEach(b=>b.onclick=()=>{sel=b.dataset.me;ddOpen=false;ddQ="";abrirSenha()});
+}
+
 /* ===================== SENHA DO ALUNO ===================== */
-const senhaDe=s=>norm(s.n.split(" ")[0])+"@encontro";
-const limpa=v=>v.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"");
+function sair(){me=null;sess=null;ls.del("sementes_sessao");go("pick")}
+async function abrirSenha(){
+  pwState="carregando";go("senha");
+  try{
+    const {data:tem,error}=await sb.rpc("sementes_tem_senha",{p_id:sel});
+    if(error)throw error;
+    pwState=tem?"existe":"novo";
+  }catch(e){pwState="erro"}
+  if(mode==="senha")renderSenha();
+}
 function renderSenha(){
   const s=ST.find(x=>x.id===sel);if(!s)return go("pick");
+  const nome=s.n.split(" ")[0],novo=pwState==="novo";
+  const campo=(id,ph,ac)=>`<div class="pwrow"><input id="${id}" type="password" placeholder="${ph}" autocomplete="${ac}" autocapitalize="none" autocorrect="off" spellcheck="false"><button type="button" class="pwEye" aria-label="Mostrar senha">👁️</button></div>`;
+  let corpo;
+  if(pwState==="carregando")corpo=`<div class="pwload"><span>🌱</span>Verificando seu acesso...</div>`;
+  else if(pwState==="erro")corpo=`<div class="pwmsg" style="text-align:center">Não foi possível conectar. Verifique a internet.</div><button class="btn" id="pwRetry">Tentar de novo</button>`;
+  else corpo=`<div class="pwtag ${novo?"peach":"sky"}">${novo?"✨ Primeiro acesso":"🔑 Bem-vindo(a) de volta"}</div>
+    <p class="mu" style="margin:6px 0 0">${novo?`Olá, ${nome}! Crie uma senha só sua. Você vai usá-la sempre que entrar.`:"Digite a senha que você criou."}</p>
+    <form id="pwf" class="pwbox">
+      <label class="lbl" for="pw">${novo?"Crie sua senha":"Sua senha"}</label>${campo("pw",novo?"Mínimo de 4 caracteres":"Digite sua senha",novo?"new-password":"current-password")}
+      ${novo?`<div class="pwmeter"><i id="pwM"></i></div><label class="lbl" for="pw2" style="margin-top:12px">Repita a senha</label>${campo("pw2","Digite de novo","new-password")}`:""}
+      <div class="pwmsg" id="pwMsg"></div>
+      <button class="btn" type="submit" id="pwGo">${novo?"Criar senha e entrar":"Entrar"}</button>
+      ${novo?`<div class="mu" style="margin-top:10px;font-size:12.5px">💡 Anote sua senha. Se esquecer, fale com a liderança.</div>`:`<div class="mu" style="margin-top:10px;font-size:12.5px">Esqueceu a senha? Fale com a liderança para redefinir.</div>`}
+    </form>`;
   paint(`<section class="card pin"><span class="av ${s.c}" style="width:64px;height:64px;font-size:20px;margin:0 auto">${ini(s.n)}</span>
-  <div class="h2" style="margin-top:12px">${s.n}</div><div class="mu">Turma de ${s.t.toLowerCase()}</div>
-  <form id="pwf" class="pwbox" autocomplete="off">
-    <label class="lbl" for="pw" style="display:block;text-align:left;margin-bottom:6px">Sua senha</label>
-    <div class="pwrow ${pwErr?"bad":""}"><input id="pw" type="${pwShow?"text":"password"}" placeholder="Digite sua senha" autocapitalize="none" autocorrect="off" spellcheck="false"><button type="button" id="pwEye" aria-label="Mostrar senha">${pwShow?"🙈":"👁️"}</button></div>
-    <div class="pwmsg">${pwErr?"Senha incorreta. Confira e tente de novo.":""}</div>
-    <button class="btn" type="submit" style="margin-top:6px">Entrar</button>
-  </form>
-  <button class="pill" id="pwBack" style="margin-top:14px;box-shadow:none">‹ Não sou eu, voltar</button></section>`,"senha");
-  const i=$("pw");setTimeout(()=>i.focus(),250);
-  $("pwEye").onclick=()=>{pwShow=!pwShow;const v=i.value;renderSenha();$("pw").value=v};
+  <div class="h2" style="margin-top:12px">${s.n}</div><div class="mu">Turma de ${s.t.toLowerCase()}</div>${corpo}
+  <button class="pill" id="pwBack" style="margin-top:16px;box-shadow:none">‹ Não sou eu, voltar</button></section>`,"senha"+pwState);
   $("pwBack").onclick=()=>{sel=null;go("pick")};
-  $("pwf").onsubmit=e=>{
-    e.preventDefault();
-    if(limpa(i.value)===senhaDe(s)){me=s.id;ls.set("sementes_login",me);sel=null;wk=null;toast("Bem-vindo(a), "+s.n.split(" ")[0]+"! 🌱");go("aluna")}
-    else{pwErr=true;const v=i.value;renderSenha();$("pw").value=v;if(navigator.vibrate)navigator.vibrate(120)}
+  if(pwState==="erro")$("pwRetry").onclick=abrirSenha;
+  if(!$("pwf"))return;
+  const i=$("pw"),i2=$("pw2"),msg=$("pwMsg"),btn=$("pwGo");
+  setTimeout(()=>i.focus(),250);
+  document.querySelectorAll(".pwEye").forEach(b=>b.onclick=()=>{const t=i.type==="password"?"text":"password";[i,i2].forEach(x=>x&&(x.type=t));document.querySelectorAll(".pwEye").forEach(e=>e.textContent=t==="text"?"🙈":"👁️")});
+  const erro=(t,el)=>{msg.textContent=t;const r=(el||i).parentNode;r.classList.remove("bad");void r.offsetWidth;r.classList.add("bad");if(navigator.vibrate)navigator.vibrate(120)};
+  if(novo)i.oninput=()=>{const n=i.value.length,f=$("pwM");f.style.width=Math.min(100,n/8*100)+"%";f.className=n<4?"r":n<7?"y":"g";msg.textContent=""};
+  $("pwf").onsubmit=async e=>{
+    e.preventDefault();msg.textContent="";
+    const v=i.value;
+    if(novo){
+      if(v.length<4)return erro("A senha precisa ter pelo menos 4 caracteres.");
+      if(v!==i2.value)return erro("As duas senhas não são iguais.",i2);
+    }else if(!v)return erro("Digite sua senha.");
+    btn.disabled=true;btn.textContent=novo?"Criando...":"Entrando...";
+    try{
+      const {data:tk,error}=await sb.rpc(novo?"sementes_cadastrar":"sementes_entrar",{p_id:s.id,p_senha:v});
+      if(error)throw error;
+      if(!tk){
+        btn.disabled=false;btn.textContent=novo?"Criar senha e entrar":"Entrar";
+        if(novo){pwState="existe";renderSenha();$("pwMsg").textContent="Este nome já tem senha cadastrada. Digite a senha ou fale com a liderança.";return}
+        return erro("Senha incorreta. Confira e tente de novo.");
+      }
+      sess={id:s.id,token:tk};ls.set("sementes_sessao",JSON.stringify(sess));
+      me=s.id;sel=null;wk=null;
+      toast(novo?"Senha criada! Bem-vindo(a), "+nome+" 🌱":"Bem-vindo(a), "+nome+"! 🌱");go("aluna");
+    }catch(err){btn.disabled=false;btn.textContent=novo?"Criar senha e entrar":"Entrar";erro("Não foi possível conectar. Tente de novo.")}
   };
 }
 
@@ -482,7 +554,7 @@ function pinKey(n){
   if(pinTxt.length>=4)return;
   pinTxt+=n;
   if(pinTxt.length<4)return renderPin();
-  if(pinTxt===CFG.codigoLider){renderPin("good");ls.set("sementes_lider","1");pinTxt="";setTimeout(()=>go("lider"),350)}
+  if(pinTxt===CFG.codigoLider){renderPin("good");ls.set("sementes_lider","1");pinTxt="";setTimeout(()=>{go("lider");if(sb)carregar().then(render).catch(()=>{})},350)}
   else{renderPin("bad");if(navigator.vibrate)navigator.vibrate(120);setTimeout(()=>{pinTxt="";renderPin()},650)}
 }
 document.addEventListener("keydown",e=>{if(mode!=="pin")return;if(/^[0-9]$/.test(e.key))pinKey(e.key);else if(e.key==="Backspace"){pinTxt=pinTxt.slice(0,-1);renderPin()}});
@@ -491,8 +563,9 @@ document.addEventListener("keydown",e=>{if(mode!=="pin")return;if(/^[0-9]$/.test
 async function salvar(){
   const id=me;lastSave[id]=Date.now();
   try{
-    const {error}=await sb.from(CFG.tabela).update({dados:get(id)}).eq("id",id);
+    const {data:okk,error}=await sb.rpc("sementes_salvar",{p_id:id,p_token:sess&&sess.token,p_dados:get(id)});
     if(error)throw error;
+    if(okk===false){toast("Seu acesso expirou. Entre de novo com sua senha.",true);setTimeout(sair,1200);return}
     toast("Salvo ✓");
   }catch(e){toast("Não salvou. Confira a internet e toque de novo.",true)}
 }
@@ -628,16 +701,24 @@ function listA(){
   $("sl").innerHTML=l.length?l.map(s=>{
     const p=pts(s.id,r),pv=r>1?pts(s.id,r-1):p;
     const tr=p>pv?'<span class="tr-up">▲</span>':p<pv?'<span class="tr-dn">▼</span>':"";
-    let h=`<div class="card st hv" data-o="${s.id}"><div class="hd"><div class="who">${av(s)}<span><b>${s.n}</b> ${tr}<br><span class="mu"><span class="sd ${cls(p)}"></span> ${s.t} · S${r}: ${p}/10</span> ${started(s.id)?"":'<span class="tag">nunca entrou</span>'}</span></div><span style="white-space:nowrap;text-align:right"><b class="serif" style="font-size:24px;font-weight:600">${tot(s.id)}</b><span class="mu">/70</span></span></div>
+    let h=`<div class="card st hv" data-o="${s.id}"><div class="hd"><div class="who">${av(s)}<span><b>${s.n}</b> ${tr}<br><span class="mu"><span class="sd ${cls(p)}"></span> ${s.t} · S${r}: ${p}/10</span> ${cad.has(s.id)?'<span class="tag ok">🔑 senha criada</span>':'<span class="tag">sem senha</span>'}</span></div><span style="white-space:nowrap;text-align:right"><b class="serif" style="font-size:24px;font-weight:600">${tot(s.id)}</b><span class="mu">/70</span></span></div>
     <div class="sp">${W.map(w=>{const v=pts(s.id,w);return `<i class="${v?cls(v):""}" style="height:${Math.max(v*10,8)}%"></i>`}).join("")}</div>
     <div class="sn">${W.map(w=>`<span>S${w}<br><b>${pts(s.id,w)}</b></span>`).join("")}</div>`;
     if(open===s.id){
       h+=`<div class="scroll" style="margin-top:14px"><table>${W.map(w=>{const m=mk(s.id,w);return `<tr><td><b>S${w}</b></td><td>${ACT.map((a,i)=>`<span class="ai ${a[2]} ${m[i]!=="0"?"on":""}" title="${a[1]}">${a[0]}</span>`).join("")}</td><td class="mu">📖 +${rec(s.id,w)}</td><td class="n"><b>${pts(s.id,w)}</b></td></tr>`}).join("")}</table></div>
-      <div class="mu" style="margin-top:8px">${ACT.map(a=>a[0]+" "+a[1]).join(" · ")}${upd[s.id]?`<br>Última atualização: ${new Date(upd[s.id]).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`:""}</div>`;
+      <div class="mu" style="margin-top:8px">${ACT.map(a=>a[0]+" "+a[1]).join(" · ")}${upd[s.id]?`<br>Última atualização: ${new Date(upd[s.id]).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`:""}</div>
+      ${cad.has(s.id)?`<button class="rst" data-rst="${s.id}">🔑 Redefinir senha</button><div class="mu" style="font-size:12px;margin-top:6px">Use se o aluno esqueceu a senha. Ele vai criar uma nova no próximo acesso.</div>`:`<div class="mu" style="font-size:12px;margin-top:10px">Ainda não criou senha.</div>`}`;
     }else h+=`<div class="mu" style="margin-top:8px;text-align:center;font-size:12px">Toque para ver o detalhe</div>`;
     return h+"</div>";
   }).join(""):'<div class="card mu">Nenhum aluno encontrado.</div>';
   document.querySelectorAll("[data-o]").forEach(c=>c.onclick=()=>{open=open===c.dataset.o?null:c.dataset.o;listA()});
+  document.querySelectorAll("[data-rst]").forEach(b=>b.onclick=async e=>{
+    e.stopPropagation();const s=ST.find(x=>x.id===b.dataset.rst);
+    if(!confirm(`Apagar a senha de ${s.n}? No próximo acesso ele vai criar uma nova.`))return;
+    try{const {data:r,error}=await sb.rpc("sementes_resetar",{p_id:s.id,p_codigo:CFG.codigoLider});if(error)throw error;
+      if(r){cad.delete(s.id);toast("Senha de "+s.n.split(" ")[0]+" apagada ✓");listA()}else toast("Não foi possível redefinir.",true)}
+    catch(err){toast("Não foi possível redefinir.",true)}
+  });
 }
 
 function vR(){
@@ -669,9 +750,9 @@ const TOUR=[
  {c:"sage",t:"Boas-vindas ao Desafio das Sementes",
   p:"Durante <b>7 semanas</b> você vai plantar sementes cumprindo as atividades do Módulo 1. A meta é chegar a <b>10 sementes por semana</b>.",
   a:()=>`<div class="tdemo-big">🌱</div><div class="tstats"><span>📅 7 semanas</span><span>✅ 5 atividades</span><span>🎯 10 por semana</span></div>`},
- {c:"sky",t:"Entre com seu nome e senha",
-  p:"Escolha sua <b>turma</b>, toque no seu <b>nome</b> e digite a <b>senha que você recebeu</b>. Depois disso o aparelho lembra de você. Esqueceu a senha? Fale com a liderança.",
-  a:()=>`<div class="tlogin"><div class="who"><span class="av sky">CG</span><span><b>Carolina Gomes</b><br><span class="mu">Turma de segunda</span></span></div><div class="tfield"><span id="tType"></span><span class="caret"></span></div></div><span class="thint">🔒 Sua senha é pessoal, não compartilhe</span>`,
+ {c:"sky",t:"Entre e crie sua senha",
+  p:"Escolha sua <b>turma</b> e toque em <b>Selecione seu nome</b> para abrir a lista. No <b>primeiro acesso</b> você cria uma senha só sua; nas próximas vezes, é só digitá-la.",
+  a:()=>`<div class="tlogin"><div class="tddfake">👤 Selecione seu nome <span>⌄</span></div><div class="lbl" style="margin:10px 0 6px">✨ Crie sua senha</div><div class="tfield"><span id="tType"></span><span class="caret"></span></div></div><span class="thint">🔒 Sua senha é pessoal, não compartilhe</span>`,
   go:()=>{const el=$("tType"),txt="•••••••••••";let i=0;tTimer=setInterval(()=>{if(!el.isConnected)return clearInterval(tTimer);i=i>txt.length+6?0:i+1;el.textContent=txt.slice(0,i)},140)}},
  {c:"peach",t:"Plante suas sementes",
   p:"Cada atividade cumprida vale <b>+2 sementes</b>. Toque nas atividades que você fez na semana. Se marcar errado, toque de novo para desfazer. <b>Experimente aqui:</b>",
@@ -730,6 +811,7 @@ async function carregar(){
   const {data:rows,error}=await sb.from(CFG.tabela).select("id,dados,updated_at");
   if(error)throw error;
   rows.forEach(r=>{upd[r.id]=r.updated_at;if(Date.now()-(lastSave[r.id]||0)>5000)data[r.id]=r.dados||{}});
+  if(mode==="lider"){try{const {data:c}=await sb.rpc("sementes_cadastrados");if(c)cad=new Set(c.map(x=>typeof x==="string"?x:Object.values(x)[0]))}catch(e){}}
   ok=true;lastUpd=new Date();$("warn").innerHTML="";
 }
 
