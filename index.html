@@ -324,7 +324,7 @@ tr.p1 td:last-child,tr.p2 td:last-child,tr.p3 td:last-child{border-radius:0 14px
 .trange{width:100%;max-width:300px;accent-color:var(--sage-d)}
 .tstages{display:flex;justify-content:space-between;width:100%;max-width:300px;font-size:18px}
 .tstages span{opacity:.25;transition:all .3s}.tstages span.on{opacity:1;transform:scale(1.15)}
-.tprizes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:100%}
+.tprizes{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%}
 .tprizes button{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px 0;font-size:12px;font-weight:800;cursor:pointer;color:var(--mu)}
 .tprizes button.on{background:var(--cd);color:var(--card);border-color:var(--cd)}
 .tpz{background:var(--card);border-radius:16px;padding:12px 14px;font-weight:700;width:100%;min-height:52px;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -374,7 +374,7 @@ tr.det td{background:none;padding:0 0 10px;white-space:normal}
 </head>
 <body>
 <header class="hero"><div class="hero-in">
-  <div class="brand"><div class="logo" id="logo">🌱</div><div style="min-width:0"><h1 id="ttl">Desafio das Sementes</h1><div class="sub" id="sub">Tenda do Encontro · Módulo 1 · Semanas 2 a 7</div></div></div>
+  <div class="brand"><div class="logo" id="logo">🌱</div><div style="min-width:0"><h1 id="ttl">Desafio das Sementes</h1><div class="sub" id="sub">Tenda do Encontro · Módulo 1 · 7 semanas</div></div></div>
   <div class="hbtns"><span class="pill live off" id="live" style="display:none"><i></i></span><button class="pill" id="man" style="display:none">📘 Manual</button><button class="pill" id="who" style="display:none"></button></div>
 </div></header>
 <div class="wrap"><div id="warn"></div><main id="app"><div class="loading">🌱</div></main></div>
@@ -390,6 +390,7 @@ const CFG = {
   codigoLider: "2810"
 };
 // Calendário (horário de Brasília): Semana 1 começa em 20/10/2026.
+// Semana 1 (20/10 a 26/10) só contabiliza o que já tinha sido lançado; os lançamentos novos vão da Semana 2 à 7.
 // Semana 2: 27/10 a 02/11 · Semana 3: 03/11 a 09/11 · ... · Semana 7: 01/12 a 07/12
 const PESSOAS = [
   ["seg","alexandre-oliva","Alexandre Oliva"],["seg","carolina-gomes","Carolina Gomes"],["seg","daniel-alves","Daniel Alves"],
@@ -404,12 +405,12 @@ const ACT = [["🎥","Assistir às aulas","sky","aulas"],["🤝","Participar do 
 const ITEM = {...Object.fromEntries(ACT.map(a=>[a[3],a])),complementar:["📚","Leitura complementar","blush","complementar"]};
 const LIVROS = {2:"O Poder da Cura — Randy Clark",3:"Sentindo o Abraço do Pai — Jack Frost"};
 const PR = ["Livro de até R$ 50","Kit Surpresa Tenda","Acesso à aula de quarta-feira do Módulo 2","1 entrada para o Encontro","Acesso à aula de quarta-feira do Módulo 2","Um livro complementar","Um caderno PROFÉTICO"];
-const STAGES = [[0,"🌰","Semente"],[2.5,"🌱","Broto"],[12.5,"🌿","Muda"],[25,"🪴","Planta jovem"],[37.5,"🌳","Árvore"],[50,"🍎","Árvore frutífera"]];
+const STAGES = [[0,"🌰","Semente"],[2.5,"🌱","Broto"],[15,"🌿","Muda"],[30,"🪴","Planta jovem"],[45,"🌳","Árvore"],[60,"🍎","Árvore frutífera"]];
 const WEMO = ["🌰","🌱","🌿","🌳","🏆"];
 const CORES = ["sage","sky","lav","peach","blush","butter"];
 /* ======================================================== */
 
-const W=[2,3,4,5,6,7],PT=2.5,MAXT=W.length*10;
+const W=[1,2,3,4,5,6,7],PT=2.5,MAXT=W.length*10;
 const ST=PESSOAS.map(([t,s,n],i)=>({id:t+"_"+s,n,t:t==="seg"?"Segunda":"Sábado",c:CORES[i%6]}));
 const $=id=>document.getElementById(id);
 const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"");
@@ -488,7 +489,7 @@ function header(){
   document.body.classList.toggle("lider",mode==="lider");
   $("logo").textContent=mode==="lider"?"📊":"🌱";
   $("ttl").textContent=mode==="lider"?"Painel do Líder":"Desafio das Sementes";
-  $("sub").textContent=mode==="lider"?"Desafio das Sementes · acompanhamento das turmas":"Tenda do Encontro · Módulo 1 · Semanas 2 a 7";
+  $("sub").textContent=mode==="lider"?"Desafio das Sementes · acompanhamento das turmas":"Tenda do Encontro · Módulo 1 · 7 semanas";
   live.style.display=mode==="lider"?"":"none";
   $("man").style.display=mode==="lider"||mode==="pin"?"none":"";$("man").onclick=()=>openTour();
   if(mode==="lider"){
@@ -677,7 +678,7 @@ function renderAluna(){
   }else if(closed(wk)){
     h+=`<section class="card ${p===10?"full":""}"><div class="wk">${ring}
       <div style="min-width:0"><div class="lbl">Semana ${wk} · ${wLbl(wk)}</div><div class="h2">${p===10?"Semana completa! 🎉":fmt(p)+" de 10 sementes"}</div><span class="chip blush">🔒 Semana encerrada</span></div></div>${seeds}
-      <div class="tip">Esta semana terminou em ${dm(wFim(wk))}, então não dá mais para lançar nela.${sa<=7?` O que você lançar hoje conta na <b>Semana ${sa}</b>.`:""}</div>
+      <div class="tip">${wk===1?"A Semana 1 só contabiliza o que você já tinha lançado antes. Não é possível lançar nela.":`Esta semana terminou em ${dm(wFim(wk))}, então não dá mais para lançar nela.`}${sa>=2&&sa<=7?` O que você lançar hoje conta na <b>Semana ${sa}</b>.`:""}</div>
       ${ACT.map((a,i)=>{const d=m[i]==="1";return `<div class="act ro ${a[2]} ${d?"done":"off"}"><span class="bub">${d?"✓":a[0]}</span><span class="tx">${a[1]}${quando(a[3])}</span><span class="pt">${d?"+2,5 🌱":"0"}</span></div>`}).join("")}
       ${cs?`<div class="act ro blush done"><span class="bub">✓</span><span class="tx">Leitura complementar${quando("complementar")}</span><span class="pt">+2,5 🌱</span></div>`:""}
       ${sa<=7?`<button class="btn" data-w="${saC()}">Ir para a semana atual (Semana ${saC()})</button>`:""}</section>`;
@@ -750,7 +751,7 @@ function vO(){
   bindL=()=>{};
   const r=ref(),L=fil(),n=L.length,ids=new Set(L.map(s=>s.id));
   const reg=L.filter(s=>started(s.id)).length,full=L.filter(s=>pts(s.id,r)===10).length;
-  const ws=W.filter(w=>w<=saC());
+  const ws=W.filter(w=>w>=2&&w<=saC());
   const ad=n?Math.round(L.reduce((a,s)=>a+ws.reduce((b,w)=>b+pts(s.id,w),0),0)/(n*10*ws.length)*100):0;
   const c={g:0,y:0,r:0};L.forEach(s=>c[cls(pts(s.id,r))]++);
   const hojeK=fmtD(Date.now(),{dateStyle:"short"});
@@ -884,7 +885,7 @@ function vH(){
 function listH(){
   const rows=linhasH(),soma=rows.reduce((a,x)=>a+(x.e&&!x.e.marcado?-PT:PT),0);
   const lim=hMais?rows.length:Math.min(rows.length,60);
-  $("hl").innerHTML=`<div class="hsum"><div><div class="lbl">${hW==="todas"?"Semanas 2 a 7":"Semana "+hW+" · "+wLbl(hW)}</div><div class="h2">${rows.length} lançamento${rows.length===1?"":"s"}</div><div class="mu">${hModo==="validos"?`Somam ${fmt(soma)} sementes no ranking`:"Inclui lançamentos desfeitos (−2,5)"}</div></div><button class="pill" id="hcsv" style="box-shadow:none">⬇ CSV</button></div>
+  $("hl").innerHTML=`<div class="hsum"><div><div class="lbl">${hW==="todas"?"Todas as semanas":"Semana "+hW+" · "+wLbl(hW)}</div><div class="h2">${rows.length} lançamento${rows.length===1?"":"s"}</div><div class="mu">${hModo==="validos"?`Somam ${fmt(soma)} sementes no ranking`:"Inclui lançamentos desfeitos (−2,5)"}</div></div><button class="pill" id="hcsv" style="box-shadow:none">⬇ CSV</button></div>
   <div class="mu legend"><span class="sc g">No prazo</span> lançado dentro da semana · <span class="sc y">Horário aproximado</span> histórico antigo (último salvamento) · <span class="sc n">Sem horário</span> lançado antes do registro</div>
   ${rows.slice(0,lim).map(x=>evLine(x.s,x.it,x.e,x.w,true)).join("")||'<div class="mu" style="padding:14px 0">Nenhum lançamento com esses filtros.</div>'}
   ${rows.length>lim?`<button class="btn" id="hmais">Mostrar todos (${rows.length})</button>`:""}`;
@@ -898,8 +899,8 @@ function listH(){
 let tStep=0,tDir=1,tTimer=null,tDemo=[0,0,0,0],tRec=0,tSeed=20,tPrize=1,tX=null;
 const TOUR=[
  {c:"sage",t:"Boas-vindas ao Desafio das Sementes",
-  p:"Da <b>Semana 2 à Semana 7</b> você planta sementes cumprindo as atividades do Módulo 1. Cada semana vale até <b>10 sementes</b>.",
-  a:()=>`<div class="tdemo-big">🌱</div><div class="tstats"><span>📅 Semanas 2 a 7</span><span>✅ 4 atividades</span><span>🎯 10 por semana</span></div>`},
+  p:"Durante <b>7 semanas</b> você planta sementes cumprindo as atividades do Módulo 1. Cada semana vale até <b>10 sementes</b>.",
+  a:()=>`<div class="tdemo-big">🌱</div><div class="tstats"><span>📅 7 semanas</span><span>✅ 4 atividades</span><span>🎯 10 por semana</span></div>`},
  {c:"sky",t:"Entre e crie sua senha",
   p:"Escolha sua <b>turma</b> e toque em <b>Selecione seu nome</b> para abrir a lista. No <b>primeiro acesso</b> você cria uma senha só sua; nas próximas vezes, é só digitá-la.",
   a:()=>`<div class="tlogin"><div class="tddfake">👤 Selecione seu nome <span>⌄</span></div><div class="lbl" style="margin:10px 0 6px">✨ Crie sua senha</div><div class="tfield"><span id="tType"></span><span class="caret"></span></div></div><span class="thint">🔒 Sua senha é pessoal, não compartilhe</span>`,
