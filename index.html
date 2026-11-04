@@ -474,6 +474,8 @@ const CORES = ["sage","sky","lav","peach","blush","butter"];
 const CTRL=[1,2];
 const W=[1,2,3,4,5,6,7],PT=2.5,COMP=W.filter(w=>!CTRL.includes(w)),MAXT=COMP.length*10;
 const isCtrl=w=>CTRL.includes(w);
+// Vencedores das semanas de controle, definidos pela liderança
+const VENC_MANUAL={1:"seg_diogo",2:"sab_vanessa"};
 const compLbl="Semanas "+COMP[0]+" a "+COMP[COMP.length-1];
 const ST=PESSOAS.map(([t,s,n],i)=>({id:t+"_"+s,n,t:t==="seg"?"Segunda":"Sábado",c:CORES[i%6]}));
 const $=id=>document.getElementById(id);
@@ -856,6 +858,15 @@ function classif(w,L){
 const conclTxt=c=>!c?"":c.t==null?"horário não registrado":(c.aprox?"≈ ":"")+dataH(c.t);
 const wStatus=w=>{const sa=semanaAtual();return w<sa?"fim":w===sa?"andamento":"futura"};
 function destaque(w){
+  if(isCtrl(w)&&VENC_MANUAL[w]){const g=ST.find(x=>x.id===VENC_MANUAL[w]);if(g){const p=pts(g.id,w);
+    return `<div class="card dest"><div class="dh"><div class="lbl">⭐ Destaque da Semana ${w} · ${wLbl(w)}</div><span class="dst fim">🏆 Semana encerrada</span></div>
+    <div class="dwin"><div class="dav ${g.c}"><span class="crown">👑</span>${ini(g.n)}<i class="sp1">✦</i><i class="sp2">✦</i><i class="sp3">✦</i></div>
+      <div class="dtag">Ganhador(a) da semana</div>
+      <div class="dname">${g.n}</div><div class="mu">${g.t==="Segunda"?"Turma de segunda":"Turma de sábado"}</div>
+      <div class="dstats">${p?`<span><b>${fmt(p)}</b>/10 sementes</span>`:""}<span>🕒 Semana de controle</span></div>
+      <div class="dprize">🎁 ${PR[w-1]}</div></div>
+    <div class="dcrit">📌 Ganhador(a) definido(a) pela liderança. A Semana ${w} é de controle: não entra no ranking geral da competição (Semanas ${COMP[0]} a ${COMP[COMP.length-1]}).</div>
+    <button class="pill dcopy" data-copy="${w}">📋 Copiar texto para o WhatsApp</button></div>`}}
   if(isCtrl(w)){const inf=fil().filter(s=>contrib(s.id,w).some(x=>x.e&&x.e.horario_informado)).length,com=fil().filter(s=>pts(s.id,w)>0).length;
     return `<div class="card dest vazio"><div class="dh"><div class="lbl">Semana ${w} · ${wLbl(w)}</div><span class="dst futura">🕒 Semana de controle</span></div><div class="dvz"><div style="font-size:42px">🕒</div><div class="h2">Fora da competição</div><div class="mu">A competição conta a partir da Semana ${COMP[0]}. Nesta semana os alunos registram as atividades com o dia e a hora em que fizeram, só para controle.<br><b style="color:var(--tx)">${inf} de ${com}</b> pessoas com registros já informaram o dia e a hora.</div><button class="pill" data-v="H" style="margin-top:12px;box-shadow:none">Ver no histórico</button></div></div>`}
   const cl=classif(w),st=wStatus(w),g=cl[0],turma=fT==="Todas"?"todas as turmas":"turma de "+fT.toLowerCase();
@@ -877,10 +888,11 @@ function destaque(w){
 }
 function galeria(){
   return `<div class="card"><div class="lbl">Galeria</div><div class="h2">Ganhadores por semana</div><div class="mu">Toque em uma semana para ver o destaque.</div>
-  <div class="gal">${W.map(w=>{const g=isCtrl(w)?null:classif(w)[0],st=wStatus(w);if(isCtrl(w))return `<button class="gw ctl ${w===ref()?"on":""}" data-gw="${w}"><span class="gs">S${w}</span><span class="gvz">🕒</span><span class="mu">controle</span></button>`;return `<button class="gw ${w===ref()?"on":""} ${st}" data-gw="${w}"><span class="gs">S${w}</span>${g?`<span class="av ${g.s.c}">${ini(g.s.n)}</span><b>${g.s.n.split(" ")[0]}</b><span class="mu">${fmt(g.p)}/10</span>`:`<span class="gvz">${st==="futura"?"🔒":"🌱"}</span><span class="mu">${st==="futura"?"em breve":"—"}</span>`}${st==="andamento"&&g?'<span class="gl">ao vivo</span>':""}</button>`}).join("")}</div></div>`;
+  <div class="gal">${W.map(w=>{const g=isCtrl(w)?null:classif(w)[0],st=wStatus(w);if(isCtrl(w)){const v=VENC_MANUAL[w]&&ST.find(x=>x.id===VENC_MANUAL[w]);return v?`<button class="gw fim ${w===ref()?"on":""}" data-gw="${w}"><span class="gs">S${w} 🕒</span><span class="av ${v.c}">${ini(v.n)}</span><b>${v.n.split(" ")[0]}</b><span class="mu">controle</span></button>`:`<button class="gw ctl ${w===ref()?"on":""}" data-gw="${w}"><span class="gs">S${w}</span><span class="gvz">🕒</span><span class="mu">controle</span></button>`}return `<button class="gw ${w===ref()?"on":""} ${st}" data-gw="${w}"><span class="gs">S${w}</span>${g?`<span class="av ${g.s.c}">${ini(g.s.n)}</span><b>${g.s.n.split(" ")[0]}</b><span class="mu">${fmt(g.p)}/10</span>`:`<span class="gvz">${st==="futura"?"🔒":"🌱"}</span><span class="mu">${st==="futura"?"em breve":"—"}</span>`}${st==="andamento"&&g?'<span class="gl">ao vivo</span>':""}</button>`}).join("")}</div></div>`;
 }
 function textoDestaque(w){
-  if(isCtrl(w))return "";
+  if(isCtrl(w)){const g=VENC_MANUAL[w]&&ST.find(x=>x.id===VENC_MANUAL[w]);if(!g)return "";
+    return `🌱 *Desafio das Sementes · Tenda do Encontro*\n⭐ *Destaque da Semana ${w}* (${wLbl(w)})\n\n🏆 Ganhador(a): *${g.n}*\n🎁 Prêmio: ${PR[w-1]}\n\nParabéns! Continue plantando 🌳`}
   const cl=classif(w),g=cl[0];if(!g)return "";
   const st=wStatus(w);
   let t=`🌱 *Desafio das Sementes · Tenda do Encontro*\n⭐ *Destaque da Semana ${w}* (${wLbl(w)})\n\n🏆 ${st==="fim"?"Ganhador(a)":"Liderando"}: *${g.s.n}*\n${fmt(g.p)}/10 sementes${g.c&&g.c.t!=null?` · completou ${conclTxt(g.c)}`:""}\n🎁 Prêmio: ${PR[w-1]}`;
