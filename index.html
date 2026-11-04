@@ -370,6 +370,66 @@ tr.det td{background:none;padding:0 0 10px;white-space:normal}
 .vbars.days{height:150px}
 .vbars.days .vb span{text-align:center;line-height:1.25;font-size:11px}
 @media (max-width:420px){.tabs button{font-size:13px}}
+
+/* destaque da semana */
+.dest{position:relative;overflow:hidden;background:
+  radial-gradient(380px 200px at 0% 0%,var(--butter) 0,transparent 70%),
+  radial-gradient(360px 220px at 100% 10%,var(--peach) 0,transparent 70%),
+  radial-gradient(400px 220px at 50% 120%,var(--lav) 0,transparent 70%),var(--card);border-color:var(--gold)}
+.dh{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.dst{font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.dst.andamento{color:var(--sky-d)}.dst.fim{color:var(--gold)}.dst.futura{color:var(--mu)}
+.dwin{text-align:center;padding:14px 4px 6px}
+.dav{position:relative;width:96px;height:96px;margin:18px auto 10px;border-radius:50%;display:grid;place-items:center;font-family:Fraunces,Georgia,serif;font-size:32px;font-weight:600;background:var(--c);color:var(--cd);box-shadow:0 0 0 5px var(--card),0 0 0 8px var(--gold),0 18px 40px -12px rgba(201,143,11,.55);animation:dpulse 3s ease-in-out infinite}
+@keyframes dpulse{50%{box-shadow:0 0 0 5px var(--card),0 0 0 8px var(--gold),0 18px 50px -8px rgba(201,143,11,.75)}}
+.dav .crown{position:absolute;top:-30px;left:50%;transform:translateX(-50%) rotate(-8deg);font-size:34px;animation:crown 2.6s ease-in-out infinite}
+@keyframes crown{50%{transform:translateX(-50%) rotate(8deg) translateY(-3px)}}
+.dav i{position:absolute;font-style:normal;color:var(--gold);font-size:16px;animation:twk 2s ease-in-out infinite}
+.dav .sp1{left:-18px;top:18px}.dav .sp2{right:-20px;top:6px;animation-delay:.6s;font-size:12px}.dav .sp3{right:-12px;bottom:-4px;animation-delay:1.2s}
+@keyframes twk{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.2)}}
+.dtag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);background:var(--gold-t);border:1px solid var(--gold);padding:4px 12px;border-radius:99px}
+.dname{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:28px;line-height:1.15;margin:8px 0 2px;letter-spacing:-.01em}
+.dstats{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.dstats span{background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:13px;font-weight:600}
+.dstats b{font-family:Fraunces,Georgia,serif;font-size:16px}
+.dprize{display:inline-block;margin-top:8px;font-weight:700;font-size:14px;background:var(--card);border-radius:14px;padding:9px 14px;box-shadow:var(--sh)}
+.dpods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+@media (max-width:460px){.dpods{grid-template-columns:1fr}}
+.dpod{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 12px;min-width:0}
+.dmed{font-size:20px}.dpn{display:flex;flex-direction:column;min-width:0;font-size:14px;line-height:1.3}
+.dpn b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dpn .mu{font-size:12px}
+.dcrit{font-size:12px;color:var(--mu);margin-top:12px;line-height:1.5}
+.dwarn{font-size:12.5px;margin-top:8px;padding:8px 12px;border-radius:12px;background:var(--butter-t);color:var(--butter-d);border:1px solid var(--butter)}
+.dcopy{margin-top:12px;box-shadow:none}
+.dvz{text-align:center;padding:22px 0 8px}
+.gal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:12px}
+@media (max-width:560px){.gal{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.gw{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:16px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:12.5px;min-width:0;transition:all .2s}
+table td .who{white-space:normal}
+.gw b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gw .av{width:34px;height:34px;font-size:12px}
+.gw.fim{background:linear-gradient(170deg,var(--gold-t),var(--card))}
+.gw.futura{opacity:.55}
+.gw.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+@media (hover:hover){.gw:hover{transform:translateY(-2px)}}
+.gs{font-size:11px;font-weight:800;color:var(--mu)}
+.gvz{font-size:22px;line-height:34px}
+.gl{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--ok);font-size:0;animation:ping 2s infinite}
+
+/* semanas de controle */
+.jr .ctl .dot{background:var(--lav-t);border-style:dashed;border-color:var(--lav-d)}
+.act .tx small.when.nf{color:var(--mu)}
+.inf{display:inline-block;margin-top:6px;border:1px solid var(--lav);background:var(--lav-t);color:var(--lav-d);border-radius:99px;padding:5px 11px;font-size:12.5px;font-weight:700;cursor:pointer}
+.inff{margin-top:8px;padding:10px;border-radius:14px;background:var(--card);border:1px solid var(--lav)}
+.inff input{width:100%;margin-top:6px;padding:10px 12px;font-size:16px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--tx)}
+.inffb{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.inffb .pill{box-shadow:none;padding:7px 12px}.inffb .rm{color:var(--blush-d);border-color:var(--blush);margin-right:auto}
+.inf.novo{background:var(--card);border-style:dashed}
+.sc.l{background:var(--lav-t);color:var(--lav-d);border-color:var(--lav)}.inffb .sv{background:var(--lav-d);color:#fff;border-color:var(--lav-d)}
+.chip.lav{margin-top:6px}
+.evinf{font-size:12.5px;font-weight:600;color:var(--lav-d);margin-top:2px}
+.gw.ctl{background:var(--lav-t);border-style:dashed}
+th.ctlc,td.ctlc{color:var(--mu);background:var(--soft)}
 </style>
 </head>
 <body>
@@ -405,12 +465,16 @@ const ACT = [["🎥","Assistir às aulas","sky","aulas"],["🤝","Participar do 
 const ITEM = {...Object.fromEntries(ACT.map(a=>[a[3],a])),complementar:["📚","Leitura complementar","blush","complementar"]};
 const LIVROS = {2:"O Poder da Cura — Randy Clark",3:"Sentindo o Abraço do Pai — Jack Frost"};
 const PR = ["Livro de até R$ 50","Kit Surpresa Tenda","Acesso à aula de quarta-feira do Módulo 2","1 entrada para o Encontro","Acesso à aula de quarta-feira do Módulo 2","Um livro complementar","Um caderno PROFÉTICO"];
-const STAGES = [[0,"🌰","Semente"],[2.5,"🌱","Broto"],[15,"🌿","Muda"],[30,"🪴","Planta jovem"],[45,"🌳","Árvore"],[60,"🍎","Árvore frutífera"]];
+const STAGES = [[0,"🌰","Semente"],[2.5,"🌱","Broto"],[10,"🌿","Muda"],[20,"🪴","Planta jovem"],[30,"🌳","Árvore"],[42.5,"🍎","Árvore frutífera"]];
 const WEMO = ["🌰","🌱","🌿","🌳","🏆"];
 const CORES = ["sage","sky","lav","peach","blush","butter"];
 /* ======================================================== */
 
-const W=[1,2,3,4,5,6,7],PT=2.5,MAXT=W.length*10;
+// Semanas só de controle (o aluno informa o horário; NÃO valem para a competição)
+const CTRL=[1,2];
+const W=[1,2,3,4,5,6,7],PT=2.5,COMP=W.filter(w=>!CTRL.includes(w)),MAXT=COMP.length*10;
+const isCtrl=w=>CTRL.includes(w);
+const compLbl="Semanas "+COMP[0]+" a "+COMP[COMP.length-1];
 const ST=PESSOAS.map(([t,s,n],i)=>({id:t+"_"+s,n,t:t==="seg"?"Segunda":"Sábado",c:CORES[i%6]}));
 const $=id=>document.getElementById(id);
 const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"");
@@ -424,14 +488,14 @@ let sess=null;try{sess=JSON.parse(ls.get("sementes_sessao")||"null")}catch(e){}
 let mode="pick",me=sess&&sess.id||null,pinTxt="",pickT="Segunda",sel=null,pwState="carregando",ddOpen=false,ddQ="",cad=new Set();
 if(ls.get("sementes_lider")==="1")mode="lider";else if(me)mode="aluna";
 let wk=null,pop=-1,party=false;
-let gView="O",refWk=null,fT="Todas",rWk="geral",q="",sO="n",open=null,rOpen=null,hW="todas",hQ="",hModo="validos",hMais=false;
+let infOpen=null,gView="O",refWk=null,fT="Todas",rWk="geral",q="",sO="n",open=null,rOpen=null,hW="todas",hQ="",hModo="validos",hMais=false;
 
 const get=id=>data[id]||{};
 const mk=(id,w)=>String(get(id)["s"+w]||"0000").padEnd(4,"0").slice(0,4);
 const nAt=(id,w)=>[...mk(id,w)].filter(c=>c==="1").length;
 const comp=(id,w)=>nAt(id,w)===3&&+(get(id)["c"+w]||0)===1;
 const pts=(id,w)=>Math.min(10,nAt(id,w)*PT+(comp(id,w)?PT:0));
-const tot=id=>W.reduce((s,w)=>s+pts(id,w),0);
+const tot=id=>COMP.reduce((s,w)=>s+pts(id,w),0);  // só semanas da competição
 const fmt=n=>Number.isInteger(n)?String(n):n.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
 const stage=t=>STAGES.filter(x=>x[0]<=t).pop();
 const started=id=>W.some(w=>pts(id,w)>0);
@@ -457,6 +521,7 @@ function contrib(id,w){
 // situação do lançamento: [texto, classe]
 function sit(e){
   if(!e)return["Sem registro","n"];
+  if(CTRL.includes(e.semana))return[e.marcado?"Controle":"Removido","l"];
   if(!e.marcado)return["Desfeito","r"];
   if(!e.criado_em)return["Sem horário","n"];
   if(!e.horario_exato)return["Horário aproximado","y"];
@@ -643,6 +708,22 @@ function lancar(item,marcar){
   });
 }
 
+// Semanas de controle: o aluno informa quando fez a atividade (não muda a pontuação)
+const isoBR=ts=>new Date(new Date(ts).getTime()-3*36e5).toISOString().slice(0,16);
+async function registrarControle(item,marcar,v){
+  let quando=null;
+  if(marcar){if(!v)return toast("Escolha o dia e a hora.",true);quando=new Date(v+":00-03:00");if(isNaN(quando))return toast("Data inválida.",true)}
+  try{
+    const {data:r,error}=await sb.rpc("sementes_registrar_controle",{p_id:me,p_token:sess&&sess.token,p_semana:wk,p_item:item,p_marcar:marcar,p_quando:quando&&quando.toISOString()});
+    if(error)throw error;
+    if(r&&r.dados){data[me]=r.dados;lastSave[me]=Date.now()}
+    infOpen=null;await carregarEventos();
+    toast(marcar?"🕒 Registrado: "+dataH(quando):"Registro removido",false,2800);render();
+  }catch(e){const msg=(e&&e.message)||"";
+    if(msg.includes("ACESSO_EXPIRADO")){toast("Seu acesso expirou. Entre de novo com sua senha.",true);setTimeout(sair,1200);return}
+    toast(msg&&!/fetch|network|Failed/i.test(msg)?msg:"Não salvou. Confira a internet e tente de novo.",true,4000)}
+}
+
 function hojeCard(){
   const sa=semanaAtual(),agora=Date.now();
   const dia=fmtD(agora,{day:"2-digit"}),mes=fmtD(agora,{month:"short"}).replace(".",""),wd=fmtD(agora,{weekday:"long"});
@@ -661,9 +742,9 @@ function renderAluna(){
   h+=`<section class="card"><div class="plant"><div class="pot"><span>${sg[1]}</span></div><div style="flex:1;min-width:0">
     <div class="lbl">Olá, ${s.n.split(" ")[0]}</div><div class="big">${num("tot",T)}<span class="mu" style="font-family:'Plus Jakarta Sans';font-size:14px;letter-spacing:0"> / ${MAXT} sementes</span></div>
     <div style="margin-top:6px"><span class="chip sage">${sg[1]} ${sg[2]}</span></div>
-    <div class="mu" style="margin-top:6px">${nx?`Faltam <b style="color:var(--tx)">${fmt(nx[0]-T)}</b> para virar ${nx[2]} ${nx[1]}`:"Você chegou ao topo! 🎉"}</div></div></div>
+    <div class="mu" style="margin-top:6px">${compLbl} · ${nx?`Faltam <b style="color:var(--tx)">${fmt(nx[0]-T)}</b> para virar ${nx[2]} ${nx[1]}`:"Você chegou ao topo! 🎉"}</div></div></div>
     <div class="mbar"><div class="bar"><i style="width:${T/MAXT*100}%"></i></div>${STAGES.slice(1).map(x=>`<span class="ms ${T>=x[0]?"on":""}" style="left:${Math.max(3,x[0]/MAXT*100)}%" title="${x[2]}">${x[1]}</span>`).join("")}</div>
-    <div class="jr">${W.map(w=>{const p=pts(me,w),l=locked(w);return `<button data-w="${w}" class="${w===wk?"on":""} ${p===10?"full":p>0?"part":""} ${l?"lock":""}"><span class="dot">${l?"🔒":p===10?"🏆":fmt(p)}</span>Sem ${w}</button>`}).join("")}</div></section>`;
+    <div class="jr">${W.map(w=>{const p=pts(me,w),l=locked(w);return `<button data-w="${w}" class="${w===wk?"on":""} ${isCtrl(w)?"ctl":p===10?"full":p>0?"part":""} ${l?"lock":""}"><span class="dot">${l?"🔒":isCtrl(w)?"🕒":p===10?"🏆":fmt(p)}</span>Sem ${w}</button>`}).join("")}</div></section>`;
 
   const p=pts(me,wk),n=nAt(me,wk),m=mk(me,wk),cs=comp(me,wk),C=Object.fromEntries(contrib(me,wk).map(x=>[x.it,x.e]));
   const ring=`<div class="ring"><svg viewBox="0 0 120 120" width="116" height="116"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--soft)" stroke-width="11"/>
@@ -671,16 +752,24 @@ function renderAluna(){
       <defs><linearGradient id="gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--ok)"/><stop offset="1" stop-color="var(--ac)"/></linearGradient></defs></svg>
       <div class="rc"><span class="e">${WEMO[Math.round(p/PT)]}</span><b>${num("wk"+wk,p)}<span class="mu" style="font-family:'Plus Jakarta Sans'">/10</span></b></div></div>`;
   const seeds=`<div class="seeds">${Array.from({length:4},(_,k)=>`<span class="${k<Math.round(p/PT)?"on":""} ${pop>=0&&k===Math.round(p/PT)-1?"n":""}">🌱</span>`).join("")}</div>`;
-  const quando=it=>C[it]?`<small class="when">✓ ${C[it].criado_em?"lançado "+dataH(C[it].criado_em):"lançado antes do registro de horário"}</small>`:"";
+  const feito=it=>it==="complementar"?cs:m[ACT.findIndex(a=>a[3]===it)]==="1";
+  const quando=it=>{const e=C[it];
+    if(isCtrl(wk)){if(!feito(it))return "";return e&&e.horario_informado?`<small class="when">🕒 Você registrou: ${dataH(e.horario_informado)}</small>`:`<small class="when nf">🕒 Dia e hora ainda não informados</small>`}
+    if(!e)return "";
+    return `<small class="when">✓ ${e.criado_em?"lançado "+dataH(e.criado_em):"lançado antes do registro de horário"}</small>`};
+  const infBtn=it=>{if(!isCtrl(wk))return "";const f=feito(it),e=C[it];
+    if(infOpen===it)return `<div class="inff"><label class="lbl" for="infDt">${f?"Quando você fez esta atividade?":"Registrar: quando você fez esta atividade?"}</label><input type="datetime-local" id="infDt" min="${isoBR(wIni(wk).getTime()+3*36e5)}" max="${isoBR(Date.now())}" value="${e&&e.horario_informado?isoBR(e.horario_informado):""}"><div class="inffb">${f?`<button class="pill rm" data-infrm="${it}">Remover</button>`:""}<button class="pill" data-infx="1">Cancelar</button><button class="pill sv" data-infok="${it}">${f?"Salvar horário":"Registrar"}</button></div></div>`;
+    return `<button class="inf ${f?"":"novo"}" data-inf="${it}">${f?"🕒 "+(e&&e.horario_informado?"Alterar dia e hora":"Informar dia e hora"):"＋ Registrar com dia e hora"}</button>`};
 
   if(locked(wk)){
     h+=`<section class="card lock-msg"><div style="font-size:44px">🔒</div><div class="h2">Semana ${wk} ainda não abriu</div><div class="mu">Ela vai de ${wLbl(wk)}.${sa>=2&&sa<=7?` Foque na Semana ${sa}! 🌱`:""}</div>${sa>=2&&sa<=7?`<button class="pill" data-w="${sa}" style="margin-top:14px">Ir para a semana atual ›</button>`:""}</section>`;
   }else if(closed(wk)){
     h+=`<section class="card ${p===10?"full":""}"><div class="wk">${ring}
-      <div style="min-width:0"><div class="lbl">Semana ${wk} · ${wLbl(wk)}</div><div class="h2">${p===10?"Semana completa! 🎉":fmt(p)+" de 10 sementes"}</div><span class="chip blush">🔒 Semana encerrada</span></div></div>${seeds}
-      <div class="tip">${wk===1?"A Semana 1 só contabiliza o que você já tinha lançado antes. Não é possível lançar nela.":`Esta semana terminou em ${dm(wFim(wk))}, então não dá mais para lançar nela.`}${sa>=2&&sa<=7?` O que você lançar hoje conta na <b>Semana ${sa}</b>.`:""}</div>
-      ${ACT.map((a,i)=>{const d=m[i]==="1";return `<div class="act ro ${a[2]} ${d?"done":"off"}"><span class="bub">${d?"✓":a[0]}</span><span class="tx">${a[1]}${quando(a[3])}</span><span class="pt">${d?"+2,5 🌱":"0"}</span></div>`}).join("")}
-      ${cs?`<div class="act ro blush done"><span class="bub">✓</span><span class="tx">Leitura complementar${quando("complementar")}</span><span class="pt">+2,5 🌱</span></div>`:""}
+      <div style="min-width:0"><div class="lbl">Semana ${wk} · ${wLbl(wk)}</div><div class="h2">${p===10?"Semana completa! 🎉":fmt(p)+" de 10 sementes"}</div>${isCtrl(wk)?'<span class="chip lav">🕒 Semana de controle</span>':'<span class="chip blush">🔒 Semana encerrada</span>'}</div></div>${seeds}
+      <div class="tip">${isCtrl(wk)?`<b>Esta semana é só para controle e não vale para a competição</b>, que conta a partir da Semana ${COMP[0]}. Registre as atividades que você fez nesta semana com o <b>dia e a hora</b> em que fez cada uma.`:`Esta semana terminou em ${dm(wFim(wk))}, então não dá mais para lançar nela.`}${!isCtrl(wk)&&sa>=2&&sa<=7?` O que você lançar hoje conta na <b>Semana ${sa}</b>.`:""}</div>
+      ${ACT.map((a,i)=>{const d=m[i]==="1";return `<div class="act ro ${a[2]} ${d?"done":"off"}"><span class="bub">${d?"✓":a[0]}</span><span class="tx">${a[1]}${quando(a[3])}${infBtn(a[3])}</span><span class="pt">${d?"+2,5 🌱":"0"}</span></div>`}).join("")}
+      ${cs||(isCtrl(wk)&&n===3)?`<div class="act ro blush ${cs?"done":"off"}"><span class="bub">${cs?"✓":"📚"}</span><span class="tx">Leitura complementar${quando("complementar")}${infBtn("complementar")}</span><span class="pt">${cs?"+2,5 🌱":"0"}</span></div>`:""}
+      ${isCtrl(wk)&&n!==3&&!cs?'<div class="mu" style="margin-top:10px">📚 A leitura complementar aparece aqui quando houver 3 das 4 atividades registradas.</div>':""}
       ${sa<=7?`<button class="btn" data-w="${saC()}">Ir para a semana atual (Semana ${saC()})</button>`:""}</section>`;
   }else{
     h+=`<section class="card ${p===10?"full":""}"><div class="wk">${ring}
@@ -701,7 +790,7 @@ function renderAluna(){
     <div class="bar" style="margin-top:10px"><i style="width:${soma/(tm.length*MAXT)*100}%"></i></div>
     <div class="field">${tm.map(x=>`<span class="${x.id===me?"mine":""}">${stage(tot(x.id))[1]}</span>`).join("")}</div>
     <div class="mu">Cada planta é uma pessoa da turma; a sua está destacada. ${cheios?`${cheios} já ${cheios>1?"fecharam":"fechou"} 10/10 na semana ${fw}! 🏆`:"Quem vai ser a primeira pessoa a fechar 10/10 esta semana?"}</div></section>`;
-  h+=`<section class="card grand"><div class="lbl">🏅 Grande prêmio</div><div style="margin-top:6px;font-size:15px">Ao fim da Semana 7, quem tiver mais sementes ganha <b>50% de desconto</b>, e o 2º lugar ganha <b>50% para presentear alguém</b>.</div></section>
+  h+=`<section class="card grand"><div class="lbl">🏅 Grande prêmio</div><div style="margin-top:6px;font-size:15px">Ao fim da Semana 7, quem tiver mais sementes nas ${compLbl} ganha <b>50% de desconto</b>, e o 2º lugar ganha <b>50% para presentear alguém</b>.</div></section>
   <button class="manlink" id="alMan">📘 Ficou com dúvida? Rever o manual de instrução</button>`;
 
   paint(h,"aluna");
@@ -709,7 +798,11 @@ function renderAluna(){
   if(party&&pts(me,wk)===10)confetti();
   pop=-1;party=false;
 
-  document.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{wk=+b.dataset.w;render()});
+  document.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{wk=+b.dataset.w;infOpen=null;render()});
+  document.querySelectorAll("[data-inf]").forEach(b=>b.onclick=()=>{infOpen=b.dataset.inf;render();setTimeout(()=>{const i=$("infDt");i&&i.focus()},80)});
+  document.querySelectorAll("[data-infx]").forEach(b=>b.onclick=()=>{infOpen=null;render()});
+  document.querySelectorAll("[data-infok]").forEach(b=>b.onclick=()=>registrarControle(b.dataset.infok,true,$("infDt").value));
+  document.querySelectorAll("[data-infrm]").forEach(b=>b.onclick=()=>{if(confirm("Remover este registro da semana de controle?"))registrarControle(b.dataset.infrm,false,null)});
   document.querySelectorAll("button.act[data-i]").forEach(c=>c.onclick=()=>{const i=+c.dataset.i;lancar(ACT[i][3],mk(me,wk)[i]!=="1")});
   document.querySelectorAll("button.act[data-c]").forEach(c=>c.onclick=()=>lancar("complementar",!comp(me,wk)));
 }
@@ -729,7 +822,7 @@ function rowBar(l,v,max,txt,c){return `<div class="row ${c||"sage"}"><div class=
 // uma linha de lançamento (usada em vários lugares)
 function evLine(s,it,e,w,mostraNome){
   const a=ITEM[it],[sl,sc]=sit(e),neg=e&&!e.marcado;
-  return `<div class="evl ${neg?"neg":""}"><span class="evi ${a[2]}">${a[0]}</span><div class="evb">${mostraNome?`<b>${s.n}</b> <span class="mu">· ${s.t}</span><br>`:""}<span class="evt">${a[1]}</span><div class="mu evd">${e&&e.criado_em?dataH(e.criado_em):"sem horário registrado"} · Semana ${w}</div></div><div class="evr"><b class="${neg?"ptn":"ptp"}">${neg?"−":"+"}2,5</b><span class="sc ${sc}">${sl}</span></div></div>`;
+  return `<div class="evl ${neg?"neg":""}"><span class="evi ${a[2]}">${a[0]}</span><div class="evb">${mostraNome?`<b>${s.n}</b> <span class="mu">· ${s.t}</span><br>`:""}<span class="evt">${a[1]}</span><div class="mu evd">${e&&e.criado_em?dataH(e.criado_em):"sem horário registrado"} · Semana ${w}${isCtrl(w)?" (controle)":""}</div>${e&&e.horario_informado?`<div class="evinf">🕒 Aluno informou que fez: ${dataH(e.horario_informado)}</div>`:""}</div><div class="evr"><b class="${neg?"ptn":"ptp"}">${neg?"−":"+"}2,5</b><span class="sc ${sc}">${sl}</span></div></div>`;
 }
 
 function renderLider(){
@@ -745,23 +838,80 @@ function renderLider(){
   document.querySelectorAll("[data-rw]").forEach(b=>b.onclick=()=>{refWk=+b.dataset.rw;render()});
   document.querySelectorAll("[data-gohist]").forEach(b=>b.onclick=e=>{e.stopPropagation();hQ=b.dataset.gohist;hW="todas";gView="H";render()});
 }
+
+/* ===================== DESTAQUE DA SEMANA ===================== */
+// Momento em que a pessoa chegou à pontuação da semana = horário do último lançamento que conta.
+function concl(id,w){
+  const c=contrib(id,w);if(!c.length)return null;
+  let t=-Infinity,aprox=false,sem=false;
+  for(const x of c){if(!x.e||!x.e.criado_em){sem=true;continue}t=Math.max(t,new Date(x.e.criado_em).getTime());if(!x.e.horario_exato)aprox=true}
+  return{t:sem||t===-Infinity?null:t,aprox,sem};
+}
+// Critério: 1) maior pontuação na semana  2) empate: quem completou primeiro  3) ordem alfabética
+const tK=c=>c&&c.t!=null?c.t:Infinity;
+function classif(w,L){
+  return (L||fil()).map(s=>({s,p:pts(s.id,w),c:concl(s.id,w)})).filter(x=>x.p>0)
+    .sort((a,b)=>b.p-a.p||(tK(a.c)===tK(b.c)?0:tK(a.c)<tK(b.c)?-1:1)||a.s.n.localeCompare(b.s.n));
+}
+const conclTxt=c=>!c?"":c.t==null?"horário não registrado":(c.aprox?"≈ ":"")+dataH(c.t);
+const wStatus=w=>{const sa=semanaAtual();return w<sa?"fim":w===sa?"andamento":"futura"};
+function destaque(w){
+  if(isCtrl(w)){const inf=fil().filter(s=>contrib(s.id,w).some(x=>x.e&&x.e.horario_informado)).length,com=fil().filter(s=>pts(s.id,w)>0).length;
+    return `<div class="card dest vazio"><div class="dh"><div class="lbl">Semana ${w} · ${wLbl(w)}</div><span class="dst futura">🕒 Semana de controle</span></div><div class="dvz"><div style="font-size:42px">🕒</div><div class="h2">Fora da competição</div><div class="mu">A competição conta a partir da Semana ${COMP[0]}. Nesta semana os alunos registram as atividades com o dia e a hora em que fizeram, só para controle.<br><b style="color:var(--tx)">${inf} de ${com}</b> pessoas com registros já informaram o dia e a hora.</div><button class="pill" data-v="H" style="margin-top:12px;box-shadow:none">Ver no histórico</button></div></div>`}
+  const cl=classif(w),st=wStatus(w),g=cl[0],turma=fT==="Todas"?"todas as turmas":"turma de "+fT.toLowerCase();
+  const head=`<div class="dh"><div class="lbl">⭐ Destaque da Semana ${w} · ${wLbl(w)}</div><span class="dst ${st}">${st==="fim"?"🏆 Semana encerrada":st==="andamento"?"⏳ Semana em andamento":"🔒 Ainda não começou"}</span></div>`;
+  if(!g)return `<div class="card dest vazio">${head}<div class="dvz"><div style="font-size:42px">🌱</div><div class="h2">${st==="futura"?"Em breve":"Ninguém pontuou ainda"}</div><div class="mu">${st==="futura"?`A Semana ${w} começa em ${dm(wIni(w))}.`:"O primeiro lançamento já coloca alguém na liderança."}</div></div></div>`;
+  const incerto=g.c&&(g.c.t==null||g.c.aprox)&&cl[1]&&cl[1].p===g.p;
+  const pod=cl.slice(1,3).map((x,i)=>`<div class="dpod"><span class="dmed">${["🥈","🥉"][i]}</span>${av(x.s)}<div class="dpn"><b>${x.s.n}</b><span class="mu">${fmt(x.p)}/10 · ${conclTxt(x.c)}</span></div></div>`).join("");
+  const empatados=cl.filter(x=>x.p===g.p).length;
+  return `<div class="card dest">${head}
+    <div class="dwin"><div class="dav ${g.s.c}"><span class="crown">👑</span>${ini(g.s.n)}<i class="sp1">✦</i><i class="sp2">✦</i><i class="sp3">✦</i></div>
+      <div class="dtag">${st==="fim"?"Ganhador(a) da semana":"Liderando agora"}</div>
+      <div class="dname">${g.s.n}</div><div class="mu">${g.s.t==="Segunda"?"Turma de segunda":"Turma de sábado"}</div>
+      <div class="dstats"><span><b>${fmt(g.p)}</b>/10 sementes</span><span>⏱ ${g.c&&g.c.t!=null?(g.p===10?"Completou ":"Último lançamento ")+conclTxt(g.c):"Horário não registrado"}</span></div>
+      <div class="dprize">🎁 ${PR[w-1]}</div></div>
+    ${pod?`<div class="dpods">${pod}</div>`:""}
+    <div class="dcrit">📏 Critério: maior pontuação da semana; no empate, vence quem completou primeiro (horário do último lançamento dentro do prazo).${empatados>1?` ${empatados} pessoas empataram com ${fmt(g.p)}; o horário decidiu.`:""} Considera ${turma}.</div>
+    ${incerto?`<div class="dwarn">⚠️ O desempate usou horário aproximado ou não registrado (dados de antes do novo sistema). Vale conferir.</div>`:""}
+    <button class="pill dcopy" data-copy="${w}">📋 Copiar texto para o WhatsApp</button></div>`;
+}
+function galeria(){
+  return `<div class="card"><div class="lbl">Galeria</div><div class="h2">Ganhadores por semana</div><div class="mu">Toque em uma semana para ver o destaque.</div>
+  <div class="gal">${W.map(w=>{const g=isCtrl(w)?null:classif(w)[0],st=wStatus(w);if(isCtrl(w))return `<button class="gw ctl ${w===ref()?"on":""}" data-gw="${w}"><span class="gs">S${w}</span><span class="gvz">🕒</span><span class="mu">controle</span></button>`;return `<button class="gw ${w===ref()?"on":""} ${st}" data-gw="${w}"><span class="gs">S${w}</span>${g?`<span class="av ${g.s.c}">${ini(g.s.n)}</span><b>${g.s.n.split(" ")[0]}</b><span class="mu">${fmt(g.p)}/10</span>`:`<span class="gvz">${st==="futura"?"🔒":"🌱"}</span><span class="mu">${st==="futura"?"em breve":"—"}</span>`}${st==="andamento"&&g?'<span class="gl">ao vivo</span>':""}</button>`}).join("")}</div></div>`;
+}
+function textoDestaque(w){
+  if(isCtrl(w))return "";
+  const cl=classif(w),g=cl[0];if(!g)return "";
+  const st=wStatus(w);
+  let t=`🌱 *Desafio das Sementes · Tenda do Encontro*\n⭐ *Destaque da Semana ${w}* (${wLbl(w)})\n\n🏆 ${st==="fim"?"Ganhador(a)":"Liderando"}: *${g.s.n}*\n${fmt(g.p)}/10 sementes${g.c&&g.c.t!=null?` · completou ${conclTxt(g.c)}`:""}\n🎁 Prêmio: ${PR[w-1]}`;
+  cl.slice(1,3).forEach((x,i)=>t+=`\n${["🥈","🥉"][i]} ${x.s.n} · ${fmt(x.p)}/10`);
+  return t+"\n\nParabéns! Continue plantando 🌳";
+}
+function bindDestaque(){
+  document.querySelectorAll("[data-gw]").forEach(b=>b.onclick=()=>{refWk=+b.dataset.gw;render();const d=document.querySelector(".dest");d&&d.scrollIntoView({behavior:"smooth",block:"start"})});
+  document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=async()=>{
+    const t=textoDestaque(+b.dataset.copy);if(!t)return;
+    try{await navigator.clipboard.writeText(t);toast("Texto copiado ✓ Cole no WhatsApp")}
+    catch(e){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");toast("Texto copiado ✓")}catch(x){toast("Não foi possível copiar.",true)}a.remove()}
+  });
+}
 let bindL=()=>{};
 
 function vO(){
-  bindL=()=>{};
+  bindL=bindDestaque;
   const r=ref(),L=fil(),n=L.length,ids=new Set(L.map(s=>s.id));
   const reg=L.filter(s=>started(s.id)).length,full=L.filter(s=>pts(s.id,r)===10).length;
-  const ws=W.filter(w=>w>=2&&w<=saC());
-  const ad=n?Math.round(L.reduce((a,s)=>a+ws.reduce((b,w)=>b+pts(s.id,w),0),0)/(n*10*ws.length)*100):0;
+  const ws=COMP.filter(w=>w<=saC());
+  const ad=n&&ws.length?Math.round(L.reduce((a,s)=>a+ws.reduce((b,w)=>b+pts(s.id,w),0),0)/(n*10*ws.length)*100):0;
   const c={g:0,y:0,r:0};L.forEach(s=>c[cls(pts(s.id,r))]++);
   const hojeK=fmtD(Date.now(),{dateStyle:"short"});
   const evL=ev.filter(e=>ids.has(e.participante));
   const hoje=evL.filter(e=>e.marcado&&e.criado_em&&fmtD(e.criado_em,{dateStyle:"short"})===hojeK).length;
-  let h=`<div class="kp">
+  let h=destaque(r)+galeria()+`<div class="kp">
     <div class="sky">Já começaram<b>${num("k1",reg)}<span class="mu" style="font-size:15px">/${n}</span></b><div class="bar"><i style="width:${n?reg/n*100:0}%"></i></div></div>
     <div class="sage">Média na semana ${r}<b>${f1(avg(L,r))}<span class="mu" style="font-size:15px">/10</span></b><div class="bar"><i style="width:${avg(L,r)*10}%"></i></div></div>
     <div class="butter">Fecharam 10/10<b>${num("k3",full)}</b><div class="mu" style="margin-top:6px">na semana ${r}</div></div>
-    <div class="lav">Aderência S2 a S${saC()}<b>${num("k4",ad)}%</b><div class="bar"><i style="width:${ad}%"></i></div></div></div>`;
+    <div class="lav">Aderência S${COMP[0]} a S${Math.max(COMP[0],saC())}<b>${num("k4",ad)}%</b><div class="bar"><i style="width:${ad}%"></i></div></div></div>`;
   h+=`<div class="kp">
     <div class="sage"><span class="sd g"></span> Em dia (7,5+)<b>${num("k5",c.g)}</b></div>
     <div class="butter"><span class="sd y"></span> Atenção (5)<b>${num("k6",c.y)}</b></div>
@@ -832,27 +982,29 @@ function baixarCSV(nome,linhas){
 const csvN=n=>String(n).replace(".",",");
 
 function vR(){
-  const rows=fil().map(s=>({s,p:rWk==="geral"?tot(s.id):pts(s.id,rWk)})).sort((a,b)=>b.p-a.p||a.s.n.localeCompare(b.s.n));
+  const rows=rWk==="geral"?fil().map(s=>({s,p:tot(s.id)})).sort((a,b)=>b.p-a.p||a.s.n.localeCompare(b.s.n))
+    :(()=>{const cl=classif(rWk),ids=new Set(cl.map(x=>x.s.id));return [...cl,...fil().filter(s=>!ids.has(s.id)).sort((a,b)=>a.n.localeCompare(b.n)).map(s=>({s,p:0}))]})();
   bindL=()=>{
     document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{rWk=b.dataset.k==="geral"?"geral":+b.dataset.k;rOpen=null;render()});
     document.querySelectorAll("[data-ro]").forEach(b=>b.onclick=()=>{rOpen=rOpen===b.dataset.ro?null:b.dataset.ro;render()});
-    const c=$("csv");if(c)c.onclick=()=>baixarCSV("ranking-sementes.csv",["Aluno;Turma;"+W.map(w=>"S"+w).join(";")+";Total",...rows.map(r=>[r.s.n,r.s.t,...W.map(w=>csvN(pts(r.s.id,w))),csvN(r.p)].join(";"))]);
+    const c=$("csv");if(c)c.onclick=()=>baixarCSV("ranking-sementes.csv",["Aluno;Turma;"+W.map(w=>"S"+w+(isCtrl(w)?" (controle)":"")).join(";")+";Total competição",...rows.map(r=>[r.s.n,r.s.t,...W.map(w=>csvN(pts(r.s.id,w))),csvN(r.p)].join(";"))]);
   };
-  let h=`<div class="chips">${["geral",...W].map(w=>`<button data-k="${w}" class="${w==rWk?"on":""}">${w==="geral"?"🏆 Geral":"Semana "+w}</button>`).join("")}</div>
-  <div class="card"><div class="lbl">${rWk==="geral"?`Ranking geral · máx. ${MAXT}`:`Ranking da semana ${rWk} · ${wLbl(rWk)} · máx. 10`}</div><div class="h2">Classificação</div>
+  let h=`<div class="chips">${["geral",...W].map(w=>`<button data-k="${w}" class="${w==rWk?"on":""}">${w==="geral"?"🏆 Geral":"Semana "+w+(isCtrl(w)?" 🕒":"")}</button>`).join("")}</div>
+  <div class="card"><div class="lbl">${rWk==="geral"?`Ranking geral · ${compLbl} · máx. ${MAXT}`:`Ranking da semana ${rWk} · ${wLbl(rWk)} · máx. 10`}</div><div class="h2">${rWk!=="geral"&&isCtrl(rWk)?"Semana de controle":"Classificação"}</div>
+  ${rWk!=="geral"&&isCtrl(rWk)?`<div class="dwarn" style="margin:8px 0">🕒 Esta semana é só para controle e <b>não vale para a competição</b>. A lista abaixo é apenas informativa.</div>`:""}
   <div class="prz ${rWk==="geral"?"butter":"peach"}">${rWk==="geral"?"🥇 1º lugar: 50% de desconto · 🥈 2º lugar: 50% para presentear alguém":"🎁 "+PR[rWk-1]}</div>
-  <div class="mu" style="margin-bottom:6px">Toque em um nome para ver os lançamentos que formam a pontuação.</div><table><tr><th></th><th>Aluno</th><th class="n">Sementes</th></tr>`;
+  <div class="mu" style="margin-bottom:6px">${rWk==="geral"?"":"Ordem: maior pontuação; no empate, quem completou primeiro (⏱). "}Toque em um nome para ver os lançamentos que formam a pontuação.</div><table><tr><th></th><th>Aluno</th><th class="n">Sementes</th></tr>`;
   let pos=0,last=null;
-  h+=rows.map((r,i)=>{if(r.p!==last){pos=i+1;last=r.p}const top=r.p>0&&pos<=3;const m=top?["🥇","🥈","🥉"][pos-1]:pos+"º";
-    let t=`<tr class="${top?"p"+pos:""} clk" data-ro="${r.s.id}"><td class="pos">${m}</td><td><div class="who">${av(r.s)}<span>${r.s.n}<br><span class="mu">${r.s.t}</span></span></div></td><td class="n"><b class="serif" style="font-size:18px;font-weight:600">${fmt(r.p)}</b> <span class="mu">${rOpen===r.s.id?"▴":"▾"}</span></td></tr>`;
+  h+=rows.map((r,i)=>{if(rWk!=="geral"){pos=r.p>0?i+1:rows.filter(x=>x.p>0).length+1;last=r.p}else if(r.p!==last){pos=i+1;last=r.p}const top=r.p>0&&pos<=3&&!(rWk!=="geral"&&isCtrl(rWk));const m=top?["🥇","🥈","🥉"][pos-1]:pos+"º";
+    let t=`<tr class="${top?"p"+pos:""} clk" data-ro="${r.s.id}"><td class="pos">${m}</td><td><div class="who">${av(r.s)}<span>${r.s.n}<br><span class="mu">${r.s.t}${rWk!=="geral"&&r.c?" · ⏱ "+conclTxt(r.c):""}</span></span></div></td><td class="n"><b class="serif" style="font-size:18px;font-weight:600">${fmt(r.p)}</b> <span class="mu">${rOpen===r.s.id?"▴":"▾"}</span></td></tr>`;
     if(rOpen===r.s.id){
-      const ws=rWk==="geral"?W.filter(w=>pts(r.s.id,w)>0):[rWk];
+      const ws=rWk==="geral"?COMP.filter(w=>pts(r.s.id,w)>0):[rWk];
       const det=ws.map(w=>`<div class="wkb"><div class="wkh"><b>Semana ${w}</b> <span class="mu">${wLbl(w)}</span><b class="wkp">${fmt(pts(r.s.id,w))}/10</b></div>${contrib(r.s.id,w).map(x=>evLine(r.s,x.it,x.e,w,false)).join("")||'<div class="mu" style="padding:6px 0">Nenhum lançamento nesta semana.</div>'}</div>`).join("");
       t+=`<tr class="det"><td colspan="3">${det||'<div class="mu">Nenhum lançamento.</div>'}</td></tr>`;
     }
     return t}).join("");
   h+="</table></div>";
-  if(rWk==="geral")h+=`<div class="card"><div class="lbl">Consolidação</div><div class="h2">Sementes por semana</div><div class="scroll"><table><tr><th>Aluno</th>${W.map(w=>`<th class="n">S${w}</th>`).join("")}<th class="n">Total</th></tr>${rows.map(r=>`<tr><td>${r.s.n}</td>${W.map(w=>`<td class="n">${fmt(pts(r.s.id,w))}</td>`).join("")}<td class="n"><b>${fmt(r.p)}</b></td></tr>`).join("")}</table></div>
+  if(rWk==="geral")h+=`<div class="card"><div class="lbl">Consolidação</div><div class="h2">Sementes por semana</div><div class="mu">🕒 S${CTRL.join(" e S")}: semanas de controle, não entram no total.</div><div class="scroll"><table><tr><th>Aluno</th>${W.map(w=>`<th class="n ${isCtrl(w)?"ctlc":""}">S${w}${isCtrl(w)?"🕒":""}</th>`).join("")}<th class="n">Total</th></tr>${rows.map(r=>`<tr><td>${r.s.n}</td>${W.map(w=>`<td class="n ${isCtrl(w)?"ctlc":""}">${fmt(pts(r.s.id,w))}</td>`).join("")}<td class="n"><b>${fmt(r.p)}</b></td></tr>`).join("")}</table></div>
     <button class="btn" id="csv">Baixar planilha (CSV para Excel)</button></div>`;
   return h;
 }
@@ -886,12 +1038,12 @@ function listH(){
   const rows=linhasH(),soma=rows.reduce((a,x)=>a+(x.e&&!x.e.marcado?-PT:PT),0);
   const lim=hMais?rows.length:Math.min(rows.length,60);
   $("hl").innerHTML=`<div class="hsum"><div><div class="lbl">${hW==="todas"?"Todas as semanas":"Semana "+hW+" · "+wLbl(hW)}</div><div class="h2">${rows.length} lançamento${rows.length===1?"":"s"}</div><div class="mu">${hModo==="validos"?`Somam ${fmt(soma)} sementes no ranking`:"Inclui lançamentos desfeitos (−2,5)"}</div></div><button class="pill" id="hcsv" style="box-shadow:none">⬇ CSV</button></div>
-  <div class="mu legend"><span class="sc g">No prazo</span> lançado dentro da semana · <span class="sc y">Horário aproximado</span> histórico antigo (último salvamento) · <span class="sc n">Sem horário</span> lançado antes do registro</div>
+  <div class="mu legend"><span class="sc g">No prazo</span> lançado dentro da semana · <span class="sc y">Horário aproximado</span> histórico antigo (último salvamento) · <span class="sc n">Sem horário</span> lançado antes do registro · <span class="sc l">Controle</span> Semanas 1 e 2: dia e hora informados pelo aluno</div>
   ${rows.slice(0,lim).map(x=>evLine(x.s,x.it,x.e,x.w,true)).join("")||'<div class="mu" style="padding:14px 0">Nenhum lançamento com esses filtros.</div>'}
   ${rows.length>lim?`<button class="btn" id="hmais">Mostrar todos (${rows.length})</button>`:""}`;
   const m=$("hmais");if(m)m.onclick=()=>{hMais=true;listH()};
-  $("hcsv").onclick=()=>baixarCSV("historico-lancamentos.csv",["Data;Hora;Dia da semana;Aluno;Turma;Semana;Período da semana;Atividade;Pontos;Situação;Observação",
-    ...rows.map(x=>{const e=x.e,c=e&&e.criado_em;return [c?fmtD(c,{day:"2-digit",month:"2-digit",year:"numeric"}):"",c?fmtD(c,{hour:"2-digit",minute:"2-digit"}):"",c?fmtD(c,{weekday:"long"}):"",x.s.n,x.s.t,x.w,wLbl(x.w),ITEM[x.it][1],(e&&!e.marcado?"-":"")+"2,5",sit(e)[0],(e&&e.obs||"").replace(/;/g,",")].join(";")})]);
+  $("hcsv").onclick=()=>baixarCSV("historico-lancamentos.csv",["Data;Hora;Dia da semana;Aluno;Turma;Semana;Período da semana;Atividade;Pontos;Situação;Horário informado pelo aluno;Observação",
+    ...rows.map(x=>{const e=x.e,c=e&&e.criado_em;return [c?fmtD(c,{day:"2-digit",month:"2-digit",year:"numeric"}):"",c?fmtD(c,{hour:"2-digit",minute:"2-digit"}):"",c?fmtD(c,{weekday:"long"}):"",x.s.n,x.s.t,x.w,wLbl(x.w),ITEM[x.it][1],(e&&!e.marcado?"-":"")+"2,5",sit(e)[0],e&&e.horario_informado?fmtD(e.horario_informado,{day:"2-digit",month:"2-digit",year:"numeric"})+" "+fmtD(e.horario_informado,{hour:"2-digit",minute:"2-digit"}):"",(e&&e.obs||"").replace(/;/g,",")].join(";")})]);
 }
 
 
@@ -962,7 +1114,7 @@ document.addEventListener("keydown",e=>{if(!$("tour"))return;if(e.key==="Escape"
 
 /* ===================== DADOS (SUPABASE) ===================== */
 async function carregarEventos(){
-  let q=sb.from("desafio_sementes_lancamentos").select("id,participante,semana,item,marcado,pontos,criado_em,origem,horario_exato,obs").order("id").limit(20000);
+  let q=sb.from("desafio_sementes_lancamentos").select("id,participante,semana,item,marcado,pontos,criado_em,origem,horario_exato,obs,horario_informado").order("id").limit(20000);
   if(mode!=="lider"){if(!me)return;q=q.eq("participante",me)}
   const {data:r,error}=await q;if(error)throw error;
   ev=r.map(x=>({...x,pontos:+x.pontos}));
@@ -991,6 +1143,9 @@ if(!ls.get("sementes_manual")&&mode!=="lider")setTimeout(openTour,400);
     const r=p.new;if(!r||!r.id)return;
     upd[r.id]=r.updated_at;lastUpd=new Date();
     if(Date.now()-(lastSave[r.id]||0)>5000){data[r.id]=r.dados||{};if(mode==="aluna"||mode==="lider")render()}
+  }).on("postgres_changes",{event:"UPDATE",schema:"public",table:"desafio_sementes_lancamentos"},p=>{
+    const r=p.new;if(!r||!r.id)return;const i=ev.findIndex(x=>x.id===r.id);if(i<0)return;
+    ev[i]={...r,pontos:+r.pontos};if(mode==="lider")render();
   }).on("postgres_changes",{event:"INSERT",schema:"public",table:"desafio_sementes_lancamentos"},p=>{
     const r=p.new;if(!r||!r.id||ev.some(x=>x.id===r.id))return;
     if(mode!=="lider"&&r.participante!==me)return;
