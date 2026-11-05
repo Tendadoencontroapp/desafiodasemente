@@ -422,7 +422,7 @@ table td .who{white-space:normal}
 .inf{display:inline-block;margin-top:6px;border:1px solid var(--lav);background:var(--lav-t);color:var(--lav-d);border-radius:99px;padding:5px 11px;font-size:12.5px;font-weight:700;cursor:pointer}
 .inff{margin-top:8px;padding:10px;border-radius:14px;background:var(--card);border:1px solid var(--lav)}
 .inff input{width:100%;margin-top:6px;padding:10px 12px;font-size:16px;border-radius:12px;border:1.5px solid var(--line);background:var(--soft);color:var(--tx)}
-.inffb{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.inffb{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:8px}
 .inffb .pill{box-shadow:none;padding:7px 12px}.inffb .rm{color:var(--blush-d);border-color:var(--blush);margin-right:auto}
 .inf.novo{background:var(--card);border-style:dashed}
 .sc.l{background:var(--lav-t);color:var(--lav-d);border-color:var(--lav)}.inffb .sv{background:var(--lav-d);color:#fff;border-color:var(--lav-d)}
@@ -430,6 +430,14 @@ table td .who{white-space:normal}
 .evinf{font-size:12.5px;font-weight:600;color:var(--lav-d);margin-top:2px}
 .gw.ctl{background:var(--lav-t);border-style:dashed}
 th.ctlc,td.ctlc{color:var(--mu);background:var(--soft)}
+
+/* ajustes da liderança */
+.edb{margin-top:2px;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:3px 9px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--mu);white-space:nowrap}
+.edb.on,.edb:hover{border-color:var(--lav-d);color:var(--lav-d)}
+.edbox{margin:0 0 10px;padding:12px;border-radius:14px;background:var(--lav-t);border:1px solid var(--lav)}
+.edbox input{width:100%;padding:10px 12px;font-size:16px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--tx)}
+.evinf.adj{color:var(--peach-d)}
+.act .tx small.when.lk{color:var(--mu);font-weight:600}
 </style>
 </head>
 <body>
@@ -490,7 +498,7 @@ let sess=null;try{sess=JSON.parse(ls.get("sementes_sessao")||"null")}catch(e){}
 let mode="pick",me=sess&&sess.id||null,pinTxt="",pickT="Segunda",sel=null,pwState="carregando",ddOpen=false,ddQ="",cad=new Set();
 if(ls.get("sementes_lider")==="1")mode="lider";else if(me)mode="aluna";
 let wk=null,pop=-1,party=false;
-let infOpen=null,gView="O",refWk=null,fT="Todas",rWk="geral",q="",sO="n",open=null,rOpen=null,hW="todas",hQ="",hModo="validos",hMais=false;
+let infOpen=null,edOpen=null,gView="O",refWk=null,fT="Todas",rWk="geral",q="",sO="n",open=null,rOpen=null,hW="todas",hQ="",hModo="validos",hMais=false;
 
 const get=id=>data[id]||{};
 const mk=(id,w)=>String(get(id)["s"+w]||"0000").padEnd(4,"0").slice(0,4);
@@ -760,8 +768,9 @@ function renderAluna(){
     if(!e)return "";
     return `<small class="when">✓ ${e.criado_em?"lançado "+dataH(e.criado_em):"lançado antes do registro de horário"}</small>`};
   const infBtn=it=>{if(!isCtrl(wk))return "";const f=feito(it),e=C[it];
-    if(infOpen===it)return `<div class="inff"><label class="lbl" for="infDt">${f?"Quando você fez esta atividade?":"Registrar: quando você fez esta atividade?"}</label><input type="datetime-local" id="infDt" min="${isoBR(wIni(wk).getTime()+3*36e5)}" max="${isoBR(Date.now())}" value="${e&&e.horario_informado?isoBR(e.horario_informado):""}"><div class="inffb">${f?`<button class="pill rm" data-infrm="${it}">Remover</button>`:""}<button class="pill" data-infx="1">Cancelar</button><button class="pill sv" data-infok="${it}">${f?"Salvar horário":"Registrar"}</button></div></div>`;
-    return `<button class="inf ${f?"":"novo"}" data-inf="${it}">${f?"🕒 "+(e&&e.horario_informado?"Alterar dia e hora":"Informar dia e hora"):"＋ Registrar com dia e hora"}</button>`};
+    if(infOpen===it)return `<div class="inff"><label class="lbl" for="infDt">${f?"Quando você fez esta atividade?":"Registrar: quando você fez esta atividade?"}</label><div class="mu" style="font-size:12px;margin-top:2px">Confira antes de salvar: depois só a liderança pode alterar.</div><input type="datetime-local" id="infDt" min="${isoBR(wIni(wk).getTime()+3*36e5)}" max="${isoBR(Date.now())}" value="${e&&e.horario_informado?isoBR(e.horario_informado):""}"><div class="inffb"><button class="pill" data-infx="1">Cancelar</button><button class="pill sv" data-infok="${it}">${f?"Salvar horário":"Registrar"}</button></div></div>`;
+    if(f&&e&&e.horario_informado)return `<small class="when lk">🔒 Para corrigir ou remover, fale com a liderança.</small>`;
+    return `<button class="inf ${f?"":"novo"}" data-inf="${it}">${f?"🕒 Informar dia e hora":"＋ Registrar com dia e hora"}</button>`};
 
   if(locked(wk)){
     h+=`<section class="card lock-msg"><div style="font-size:44px">🔒</div><div class="h2">Semana ${wk} ainda não abriu</div><div class="mu">Ela vai de ${wLbl(wk)}.${sa>=2&&sa<=7?` Foque na Semana ${sa}! 🌱`:""}</div>${sa>=2&&sa<=7?`<button class="pill" data-w="${sa}" style="margin-top:14px">Ir para a semana atual ›</button>`:""}</section>`;
@@ -822,9 +831,38 @@ const ref=()=>refWk||saC();
 const fil=()=>ST.filter(s=>fT==="Todas"||s.t===fT);
 function rowBar(l,v,max,txt,c){return `<div class="row ${c||"sage"}"><div class="h"><span>${l}</span><b>${txt}</b></div><div class="bar"><i style="width:${max?Math.min(100,v/max*100):0}%"></i></div></div>`}
 // uma linha de lançamento (usada em vários lugares)
+// o registro que está valendo (não foi substituído por outro mais novo)
+const vigente=e=>!!e&&e.marcado&&!ev.some(x=>x.participante===e.participante&&x.semana===e.semana&&x.item===e.item&&x.id>e.id);
+function edBox(e){
+  const w=e.semana,ctl=isCtrl(w),fimW=wIni(w).getTime()+7*864e5+3*36e5-6e4,mx=Math.min(Date.now(),ctl?Date.now():fimW);
+  const atual=ctl?(e.horario_informado||e.criado_em):e.criado_em;
+  return `<div class="edbox" data-edbox="1"><div class="lbl">✏️ Ajuste da liderança</div>
+    <div class="mu" style="font-size:12.5px;margin:4px 0 8px">${ctl?"Semana de controle: altera o dia e a hora em que o aluno fez a atividade.":`Altera o horário do lançamento (precisa ficar entre ${wLbl(w)}). Isso pode mudar o desempate da semana.`}</div>
+    <input type="datetime-local" id="edDt" min="${isoBR(wIni(w).getTime()+3*36e5)}" max="${isoBR(mx)}" value="${atual?isoBR(atual):""}">
+    <div class="inffb"><button class="pill rm" data-edrm="${e.id}">🗑 Remover registro</button><button class="pill" data-edx="1">Cancelar</button><button class="pill sv" data-edok="${e.id}">Salvar dia e hora</button></div></div>`;
+}
+function bindEd(){
+  document.querySelectorAll("[data-ed],[data-edbox]").forEach(b=>b.addEventListener("click",e=>e.stopPropagation()));
+  document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=e=>{e.stopPropagation();edOpen=edOpen===+b.dataset.ed?null:+b.dataset.ed;refreshL()});
+  document.querySelectorAll("[data-edx]").forEach(b=>b.onclick=()=>{edOpen=null;refreshL()});
+  document.querySelectorAll("[data-edok]").forEach(b=>b.onclick=()=>liderAjustar(+b.dataset.edok,"horario",$("edDt").value));
+  document.querySelectorAll("[data-edrm]").forEach(b=>b.onclick=()=>{
+    const x=ev.find(y=>y.id===+b.dataset.edrm),s=x&&ST.find(y=>y.id===x.participante);
+    if(confirm(`Remover "${ITEM[x.item][1]}" de ${s?s.n:"aluno"} na Semana ${x.semana}? A pontuação será recalculada.`))liderAjustar(x.id,"remover",null)});
+}
+const refreshL=()=>gView==="A"?listA():gView==="H"?listH():render();
+async function liderAjustar(id,acao,v){
+  let quando=null;
+  if(acao==="horario"){if(!v)return toast("Escolha o dia e a hora.",true);quando=new Date(v+":00-03:00");if(isNaN(quando))return toast("Data inválida.",true)}
+  try{
+    const {error}=await sb.rpc("sementes_lider_ajustar",{p_codigo:CFG.codigoLider,p_evento:id,p_acao:acao,p_quando:quando&&quando.toISOString()});
+    if(error)throw error;
+    edOpen=null;await carregar();toast(acao==="remover"?"Registro removido ✓":"Dia e hora alterados ✓ "+dataH(quando),false,2600);render();
+  }catch(e){const msg=(e&&e.message)||"";toast(msg&&!/fetch|network|Failed/i.test(msg)?msg:"Não foi possível salvar. Confira a internet.",true,4000)}
+}
 function evLine(s,it,e,w,mostraNome){
-  const a=ITEM[it],[sl,sc]=sit(e),neg=e&&!e.marcado;
-  return `<div class="evl ${neg?"neg":""}"><span class="evi ${a[2]}">${a[0]}</span><div class="evb">${mostraNome?`<b>${s.n}</b> <span class="mu">· ${s.t}</span><br>`:""}<span class="evt">${a[1]}</span><div class="mu evd">${e&&e.criado_em?dataH(e.criado_em):"sem horário registrado"} · Semana ${w}${isCtrl(w)?" (controle)":""}</div>${e&&e.horario_informado?`<div class="evinf">🕒 Aluno informou que fez: ${dataH(e.horario_informado)}</div>`:""}</div><div class="evr"><b class="${neg?"ptn":"ptp"}">${neg?"−":"+"}2,5</b><span class="sc ${sc}">${sl}</span></div></div>`;
+  const a=ITEM[it],[sl,sc]=sit(e),neg=e&&!e.marcado,pode=mode==="lider"&&vigente(e);
+  return `<div class="evl ${neg?"neg":""}"><span class="evi ${a[2]}">${a[0]}</span><div class="evb">${mostraNome?`<b>${s.n}</b> <span class="mu">· ${s.t}</span><br>`:""}<span class="evt">${a[1]}</span><div class="mu evd">${e&&e.criado_em?dataH(e.criado_em):"sem horário registrado"} · Semana ${w}${isCtrl(w)?" (controle)":""}</div>${e&&e.horario_informado?`<div class="evinf">🕒 ${e.ajustado_lider&&isCtrl(w)?"Dia e hora (ajustado pela liderança)":"Aluno informou que fez"}: ${dataH(e.horario_informado)}</div>`:""}${e&&e.ajustado_lider?`<div class="evinf adj">✏️ ${neg?"Removido pela liderança":"Ajustado pela liderança"}${e.criado_em_original?" · horário original: "+dataH(e.criado_em_original):""}</div>`:""}</div><div class="evr"><b class="${neg?"ptn":"ptp"}">${neg?"−":"+"}2,5</b><span class="sc ${sc}">${sl}</span>${pode?`<button class="edb ${edOpen===e.id?"on":""}" data-ed="${e.id}">✏️ Ajustar</button>`:""}</div></div>${pode&&edOpen===e.id?edBox(e):""}`;
 }
 
 function renderLider(){
@@ -839,6 +877,7 @@ function renderLider(){
   document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{fT=b.dataset.t;render()});
   document.querySelectorAll("[data-rw]").forEach(b=>b.onclick=()=>{refWk=+b.dataset.rw;render()});
   document.querySelectorAll("[data-gohist]").forEach(b=>b.onclick=e=>{e.stopPropagation();hQ=b.dataset.gohist;hW="todas";gView="H";render()});
+  bindEd();
 }
 
 /* ===================== DESTAQUE DA SEMANA ===================== */
@@ -976,7 +1015,8 @@ function listA(){
     }else h+=`<div class="mu" style="margin-top:8px;text-align:center;font-size:12px">Toque para ver os lançamentos</div>`;
     return h+"</div>";
   }).join(""):'<div class="card mu">Nenhum aluno encontrado.</div>';
-  document.querySelectorAll("[data-o]").forEach(c=>c.onclick=()=>{open=open===c.dataset.o?null:c.dataset.o;listA()});
+  document.querySelectorAll("[data-o]").forEach(c=>c.onclick=()=>{open=open===c.dataset.o?null:c.dataset.o;edOpen=null;listA()});
+  bindEd();
   document.querySelectorAll("#sl [data-gohist]").forEach(b=>b.onclick=e=>{e.stopPropagation();hQ=b.dataset.gohist;hW="todas";gView="H";render()});
   document.querySelectorAll("[data-rst]").forEach(b=>b.onclick=async e=>{
     e.stopPropagation();const s=ST.find(x=>x.id===b.dataset.rst);
@@ -998,7 +1038,7 @@ function vR(){
     :(()=>{const cl=classif(rWk),ids=new Set(cl.map(x=>x.s.id));return [...cl,...fil().filter(s=>!ids.has(s.id)).sort((a,b)=>a.n.localeCompare(b.n)).map(s=>({s,p:0}))]})();
   bindL=()=>{
     document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{rWk=b.dataset.k==="geral"?"geral":+b.dataset.k;rOpen=null;render()});
-    document.querySelectorAll("[data-ro]").forEach(b=>b.onclick=()=>{rOpen=rOpen===b.dataset.ro?null:b.dataset.ro;render()});
+    document.querySelectorAll("[data-ro]").forEach(b=>b.onclick=()=>{rOpen=rOpen===b.dataset.ro?null:b.dataset.ro;edOpen=null;render()});
     const c=$("csv");if(c)c.onclick=()=>baixarCSV("ranking-sementes.csv",["Aluno;Turma;"+W.map(w=>"S"+w+(isCtrl(w)?" (controle)":"")).join(";")+";Total competição",...rows.map(r=>[r.s.n,r.s.t,...W.map(w=>csvN(pts(r.s.id,w))),csvN(r.p)].join(";"))]);
   };
   let h=`<div class="chips">${["geral",...W].map(w=>`<button data-k="${w}" class="${w==rWk?"on":""}">${w==="geral"?"🏆 Geral":"Semana "+w+(isCtrl(w)?" 🕒":"")}</button>`).join("")}</div>
@@ -1054,6 +1094,7 @@ function listH(){
   ${rows.slice(0,lim).map(x=>evLine(x.s,x.it,x.e,x.w,true)).join("")||'<div class="mu" style="padding:14px 0">Nenhum lançamento com esses filtros.</div>'}
   ${rows.length>lim?`<button class="btn" id="hmais">Mostrar todos (${rows.length})</button>`:""}`;
   const m=$("hmais");if(m)m.onclick=()=>{hMais=true;listH()};
+  bindEd();
   $("hcsv").onclick=()=>baixarCSV("historico-lancamentos.csv",["Data;Hora;Dia da semana;Aluno;Turma;Semana;Período da semana;Atividade;Pontos;Situação;Horário informado pelo aluno;Observação",
     ...rows.map(x=>{const e=x.e,c=e&&e.criado_em;return [c?fmtD(c,{day:"2-digit",month:"2-digit",year:"numeric"}):"",c?fmtD(c,{hour:"2-digit",minute:"2-digit"}):"",c?fmtD(c,{weekday:"long"}):"",x.s.n,x.s.t,x.w,wLbl(x.w),ITEM[x.it][1],(e&&!e.marcado?"-":"")+"2,5",sit(e)[0],e&&e.horario_informado?fmtD(e.horario_informado,{day:"2-digit",month:"2-digit",year:"numeric"})+" "+fmtD(e.horario_informado,{hour:"2-digit",minute:"2-digit"}):"",(e&&e.obs||"").replace(/;/g,",")].join(";")})]);
 }
@@ -1126,7 +1167,7 @@ document.addEventListener("keydown",e=>{if(!$("tour"))return;if(e.key==="Escape"
 
 /* ===================== DADOS (SUPABASE) ===================== */
 async function carregarEventos(){
-  let q=sb.from("desafio_sementes_lancamentos").select("id,participante,semana,item,marcado,pontos,criado_em,origem,horario_exato,obs,horario_informado").order("id").limit(20000);
+  let q=sb.from("desafio_sementes_lancamentos").select("id,participante,semana,item,marcado,pontos,criado_em,origem,horario_exato,obs,horario_informado,ajustado_lider,criado_em_original").order("id").limit(20000);
   if(mode!=="lider"){if(!me)return;q=q.eq("participante",me)}
   const {data:r,error}=await q;if(error)throw error;
   ev=r.map(x=>({...x,pontos:+x.pontos}));
