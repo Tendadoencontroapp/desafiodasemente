@@ -491,7 +491,8 @@ const CTRL=[1,2];
 const W=[1,2,3,4,5,6,7],PT=2.5,COMP=W.filter(w=>!CTRL.includes(w)),MAXT=COMP.length*10;
 const isCtrl=w=>CTRL.includes(w);
 // Cronograma dos encontros ao vivo: [turma de sábado, turma de segunda]
-// O PRAZO de cada turma na semana é até 23:59 do dia do seu encontro ao vivo.
+// "Participar do encontro ao vivo" precisa ser lançado NO DIA do encontro da turma
+// (antes ou depois = fora do prazo). As outras atividades só precisam ser da semana.
 const ENCONTROS={
   1:["2026-10-24","2026-10-26"], 2:["2026-10-31","2026-11-02"], 3:["2026-11-07","2026-11-09"],
   4:["2026-11-14","2026-11-16"], 5:["2026-11-21","2026-11-23"], 6:["2026-11-28","2026-11-30"],
@@ -550,17 +551,26 @@ const prazoFim=(turma,w)=>{const d=encDia(turma,w);return d?new Date(d+"T23:59:5
 const encLbl=(turma,w)=>{const d=encDia(turma,w);if(!d)return "";const x=new Date(d+"T12:00:00-03:00");return fmtD(x,{weekday:"short"}).replace(".","")+", "+fmtD(x,{day:"2-digit",month:"2-digit"})};
 // horário que vale para o prazo: nas semanas de controle, o que o aluno informou
 const tEv=e=>!e?null:isCtrl(e.semana)?(e.horario_informado||null):(e.criado_em||null);
-const noPrazo=e=>{const t=tEv(e);return t==null?null:new Date(t).getTime()<=prazoFim(TURMA[e.participante],e.semana)};
+const diaBR=t=>isoBR(t).slice(0,10);
+const encIni=(turma,w)=>{const d=encDia(turma,w);return d?new Date(d+"T00:00:00-03:00").getTime():null};
+// encontro ao vivo: "dia" | "antes" | "depois" (null = sem horário)
+const encSt=e=>{const t=tEv(e);if(t==null)return null;const d=encDia(TURMA[e.participante],e.semana),x=diaBR(t);return x===d?"dia":x<d?"antes":"depois"};
+const noPrazo=e=>{const t=tEv(e);if(t==null)return null;
+  if(e.item==="encontro")return encSt(e)==="dia";
+  const ms=new Date(t).getTime(),ini=wIni(e.semana).getTime()+3*36e5;return ms>=ini&&ms<ini+7*864e5};
 // situação do lançamento: [texto, classe]
 function sit(e){
   if(!e)return["Sem registro","n"];
-  const ctl=CTRL.includes(e.semana);
+  const ctl=CTRL.includes(e.semana),k=ctl?" · controle":"";
   if(!e.marcado)return[ctl?"Removido":"Desfeito","r"];
   const np=noPrazo(e);
   if(np==null)return[ctl?"Controle · sem horário":"Sem horário","n"];
-  if(ctl)return[np?"No prazo · controle":"Fora do prazo · controle",np?"l":"r"];
-  if(!e.horario_exato)return[np?"No prazo ≈":"Fora do prazo ≈","y"];
-  return np?["No prazo","g"]:["Fora do prazo","r"];
+  const ap=!ctl&&!e.horario_exato?" ≈":"";
+  if(e.item==="encontro"){const st=encSt(e);
+    if(st==="dia")return["No dia do encontro"+ap+k,ap?"y":ctl?"l":"g"];
+    return[(st==="antes"?"Antes do encontro":"Depois do encontro")+ap+k,"r"]}
+  if(ap)return[np?"No prazo ≈":"Fora da semana ≈","y"];
+  return np?["No prazo"+k,ctl?"l":"g"]:["Fora da semana"+k,"r"];
 }
 
 function toast(msg,err,ms){const t=$("toast");t.textContent=msg;t.className="toast on"+(err?" err":"");clearTimeout(t._h);t._h=setTimeout(()=>t.className="toast"+(err?" err":""),ms||(err?3000:1300))}
@@ -765,10 +775,11 @@ function hojeCard(){
   let t,d;
   if(sa<2){t="O desafio ainda não começou";d=`A Semana 2 começa em ${dm(wIni(2))}.`}
   else if(sa>7){t="O desafio terminou";d=`A Semana 7 foi até ${dm(wFim(7))}. Obrigado por participar! 🌳`}
-  else{const tm=TURMA[me],fim=prazoFim(tm,sa),pass=agora>fim;
+  else{const tm=TURMA[me],hoje=diaBR(agora),ed=encDia(tm,sa);
     t=`Semana ${sa} · ${wLbl(sa)}`;
-    d=pass?`⚠️ O prazo da sua turma nesta semana terminou em <b>${encLbl(tm,sa)}</b> (dia do encontro ao vivo). Você ainda pode lançar, mas fica marcado como <b>fora do prazo</b>.`
-      :`📅 Seu prazo nesta semana: <b>até ${encLbl(tm,sa)}</b>, dia do encontro ao vivo da sua turma. O dia e a hora de cada lançamento ficam registrados.`}
+    d=hoje===ed?`🎥 <b>Hoje é o encontro ao vivo da sua turma!</b> Lance “Participar do encontro ao vivo” hoje mesmo: em outro dia fica fora do prazo.`
+      :hoje<ed?`📅 O encontro ao vivo da sua turma é <b>${encLbl(tm,sa)}</b>. Lance “Participar do encontro ao vivo” <b>nesse dia</b> (antes ou depois fica fora do prazo).`
+      :`⚠️ O encontro ao vivo da sua turma foi <b>${encLbl(tm,sa)}</b>. Se lançar “Participar do encontro ao vivo” agora, fica <b>fora do prazo</b>.`}
   return `<section class="card today"><span class="cal"><b>${dia}</b><small>${mes}</small></span><div style="min-width:0"><div class="lbl">Hoje · ${wd}</div><div class="tt">${t}</div><div class="mu">${d}</div></div></section>`;
 }
 
@@ -792,10 +803,10 @@ function renderAluna(){
   const seeds=`<div class="seeds">${Array.from({length:4},(_,k)=>`<span class="${k<Math.round(p/PT)?"on":""} ${pop>=0&&k===Math.round(p/PT)-1?"n":""}">🌱</span>`).join("")}</div>`;
   const feito=it=>it==="complementar"?cs:m[ACT.findIndex(a=>a[3]===it)]==="1";
   const quando=it=>{const e=C[it];
-    if(isCtrl(wk)){if(!feito(it))return "";return e&&e.horario_informado?`<small class="when">🕒 Você registrou: ${dataH(e.horario_informado)}${noPrazo(e)?" · no prazo":' · <span class="late">fora do prazo</span>'}</small>`:`<small class="when nf">🕒 Dia e hora ainda não informados</small>`}
+    if(isCtrl(wk)){if(!feito(it))return "";return e&&e.horario_informado?`<small class="when">🕒 Você registrou: ${dataH(e.horario_informado)}${noPrazo(e)?" · no prazo":` · <span class="late">fora do prazo${it==="encontro"?" (o encontro foi "+encLbl(TURMA[me],wk)+")":""}</span>`}</small>`:`<small class="when nf">🕒 Dia e hora ainda não informados</small>`}
     if(!e)return "";
-    const np=noPrazo(e);
-    return `<small class="when">✓ ${e.criado_em?"lançado "+dataH(e.criado_em):"lançado antes do registro de horário"}${np===true?" · no prazo":np===false?' · <span class="late">fora do prazo</span>':""}</small>`};
+    const np=noPrazo(e),txt=it==="encontro"?{dia:"no dia do encontro",antes:"antes do dia do encontro",depois:"depois do dia do encontro"}[encSt(e)]:"";
+    return `<small class="when">✓ ${e.criado_em?"lançado "+dataH(e.criado_em):"lançado antes do registro de horário"}${np===true?" · "+(txt||"no prazo"):np===false?` · <span class="late">fora do prazo${txt?" ("+txt+")":""}</span>`:""}</small>`};
   const infBtn=it=>{if(!isCtrl(wk))return "";const f=feito(it),e=C[it];
     if(infOpen===it)return `<div class="inff"><label class="lbl" for="infDt">${f?"Quando você fez esta atividade?":"Registrar: quando você fez esta atividade?"}</label><div class="mu" style="font-size:12px;margin-top:2px">Confira antes de salvar: depois só a liderança pode alterar.</div><input type="datetime-local" id="infDt" min="${isoBR(wIni(wk).getTime()+3*36e5)}" max="${isoBR(Date.now())}" value="${e&&e.horario_informado?isoBR(e.horario_informado):""}"><div class="inffb"><button class="pill" data-infx="1">Cancelar</button><button class="pill sv" data-infok="${it}">${f?"Salvar horário":"Registrar"}</button></div></div>`;
     if(f&&e&&e.horario_informado)return `<small class="when lk">🔒 Para corrigir ou remover, fale com a liderança.</small>`;
@@ -816,7 +827,7 @@ function renderAluna(){
       <div style="min-width:0"><div class="lbl">Semana ${wk} · ${wLbl(wk)}</div><div class="h2">${p===10?"Semana completa! 🎉":p===0?"Bora plantar?":`Faltam ${fmt(10-p)} sementes`}</div>
       <div class="mu">${n} de 4 atividades${cs?" · leitura complementar +2,5":""}</div></div></div>${seeds}
       <div class="tip">Toque em cada atividade que você cumpriu para plantar <b>+2,5 sementes</b>. O dia e a hora ficam registrados. Toque de novo para desfazer.</div>
-      ${ACT.map((a,i)=>{const d=m[i]==="1";return `<button class="act ${a[2]} ${d?"done":""} ${pop===i?"pop":""}" data-i="${i}"><span class="bub">${d?"✓":a[0]}</span><span class="tx">${a[1]}${quando(a[3])}</span><span class="pt">${d?"+2,5 🌱":"+2,5"}</span>${pop===i?'<em class="fl">+2,5 🌱</em>':""}</button>`}).join("")}
+      ${ACT.map((a,i)=>{const d=m[i]==="1";return `<button class="act ${a[2]} ${d?"done":""} ${pop===i?"pop":""}" data-i="${i}"><span class="bub">${d?"✓":a[0]}</span><span class="tx">${a[1]}${quando(a[3])}${a[3]==="encontro"&&!d?`<small class="when">📅 Lance no dia do encontro: ${encLbl(TURMA[me],wk)}</small>`:""}</span><span class="pt">${d?"+2,5 🌱":"+2,5"}</span>${pop===i?'<em class="fl">+2,5 🌱</em>':""}</button>`}).join("")}
       <div class="box lav"><b class="t">📚 Leitura complementar · +2,5</b>${LIVROS[wk]?`<div class="mu" style="margin-top:2px">Livro da semana: <b style="color:var(--tx)">${LIVROS[wk]}</b></div>`:""}
       ${n===3?`<div class="mu" style="margin:4px 0 2px">Você tem 3 das 4 atividades. Leu o livro complementar? Ele completa a sua semana.</div>
         <button class="act blush ${cs?"done":""} ${pop===4?"pop":""}" data-c="1" style="background:var(--card)"><span class="bub">${cs?"✓":"📚"}</span><span class="tx">Li o livro complementar${quando("complementar")}</span><span class="pt">${cs?"+2,5 🌱":"+2,5"}</span>${pop===4?'<em class="fl">+2,5 🌱</em>':""}</button>`
@@ -843,7 +854,10 @@ function renderAluna(){
   document.querySelectorAll("[data-infx]").forEach(b=>b.onclick=()=>{infOpen=null;render()});
   document.querySelectorAll("[data-infok]").forEach(b=>b.onclick=()=>registrarControle(b.dataset.infok,true,$("infDt").value));
   document.querySelectorAll("[data-infrm]").forEach(b=>b.onclick=()=>{if(confirm("Remover este registro da semana de controle?"))registrarControle(b.dataset.infrm,false,null)});
-  document.querySelectorAll("button.act[data-i]").forEach(c=>c.onclick=()=>{const i=+c.dataset.i;lancar(ACT[i][3],mk(me,wk)[i]!=="1")});
+  document.querySelectorAll("button.act[data-i]").forEach(c=>c.onclick=()=>{const i=+c.dataset.i,marcar=mk(me,wk)[i]!=="1";
+    if(marcar&&ACT[i][3]==="encontro"){const ed=encDia(TURMA[me],wk),hj=diaBR(Date.now());
+      if(ed&&hj!==ed&&!confirm(`O encontro ao vivo da sua turma ${hj<ed?"é":"foi"} ${encLbl(TURMA[me],wk)}. Lançar hoje fica FORA DO PRAZO. Deseja lançar mesmo assim?`))return}
+    lancar(ACT[i][3],marcar)});
   document.querySelectorAll("button.act[data-c]").forEach(c=>c.onclick=()=>lancar("complementar",!comp(me,wk)));
 }
 
@@ -891,7 +905,7 @@ async function liderAjustar(id,acao,v){
 }
 function evLine(s,it,e,w,mostraNome){
   const a=ITEM[it],[sl,sc]=sit(e),neg=e&&!e.marcado,pode=mode==="lider"&&vigente(e);
-  return `<div class="evl ${neg?"neg":""}"><span class="evi ${a[2]}">${a[0]}</span><div class="evb">${mostraNome?`<b>${s.n}</b> <span class="mu">· ${s.t}</span><br>`:""}<span class="evt">${a[1]}</span><div class="mu evd">${e&&e.criado_em?dataH(e.criado_em):"sem horário registrado"} · Semana ${w}${isCtrl(w)?" (controle)":""} · prazo ${encLbl(TURMA[(e&&e.participante)||s.id],w)}</div>${e&&e.horario_informado?`<div class="evinf">🕒 ${e.ajustado_lider&&isCtrl(w)?"Dia e hora (ajustado pela liderança)":"Aluno informou que fez"}: ${dataH(e.horario_informado)}</div>`:""}${e&&e.ajustado_lider?`<div class="evinf adj">✏️ ${neg?"Removido pela liderança":"Ajustado pela liderança"}${e.criado_em_original?" · horário original: "+dataH(e.criado_em_original):""}</div>`:""}</div><div class="evr"><b class="${neg?"ptn":"ptp"}">${neg?"−":"+"}2,5</b><span class="sc ${sc}">${sl}</span>${pode?`<button class="edb ${edOpen===e.id?"on":""}" data-ed="${e.id}">✏️ Ajustar</button>`:""}</div></div>${pode&&edOpen===e.id?edBox(e):""}`;
+  return `<div class="evl ${neg?"neg":""}"><span class="evi ${a[2]}">${a[0]}</span><div class="evb">${mostraNome?`<b>${s.n}</b> <span class="mu">· ${s.t}</span><br>`:""}<span class="evt">${a[1]}</span><div class="mu evd">${e&&e.criado_em?dataH(e.criado_em):"sem horário registrado"} · Semana ${w}${isCtrl(w)?" (controle)":""} ${it==="encontro"?" · encontro "+encLbl(TURMA[(e&&e.participante)||s.id],w):""}</div>${e&&e.horario_informado?`<div class="evinf">🕒 ${e.ajustado_lider&&isCtrl(w)?"Dia e hora (ajustado pela liderança)":"Aluno informou que fez"}: ${dataH(e.horario_informado)}</div>`:""}${e&&e.ajustado_lider?`<div class="evinf adj">✏️ ${neg?"Removido pela liderança":"Ajustado pela liderança"}${e.criado_em_original?" · horário original: "+dataH(e.criado_em_original):""}</div>`:""}</div><div class="evr"><b class="${neg?"ptn":"ptp"}">${neg?"−":"+"}2,5</b><span class="sc ${sc}">${sl}</span>${pode?`<button class="edb ${edOpen===e.id?"on":""}" data-ed="${e.id}">✏️ Ajustar</button>`:""}</div></div>${pode&&edOpen===e.id?edBox(e):""}`;
 }
 
 function renderLider(){
@@ -911,30 +925,29 @@ function renderLider(){
 
 /* ===================== DESTAQUE DA SEMANA ===================== */
 // Momento em que a pessoa chegou à pontuação da semana = horário do último lançamento que conta.
-// Para cada pessoa na semana: pontos lançados dentro do prazo da SUA turma e quando completou.
-// A antecedência é medida em relação ao prazo da própria turma (dia do encontro ao vivo),
+// Para cada pessoa na semana: pontos lançados no prazo e quando completou.
+// O horário de conclusão é comparado em relação ao DIA DO ENCONTRO da própria turma,
 // para a turma de sábado não parecer "na frente" só porque o encontro dela acontece antes.
 function concl(id,w){
   const c=contrib(id,w);if(!c.length)return null;
-  const fim=prazoFim(TURMA[id],w);let t=-Infinity,aprox=false,sem=false,np=0,fora=0;
-  for(const x of c){const tt=tEv(x.e);
-    if(tt==null){sem=true;continue}
-    const ms=new Date(tt).getTime();
-    if(ms<=fim){np++;t=Math.max(t,ms);if(x.e&&!x.e.horario_exato&&!isCtrl(w))aprox=true}else fora++}
-  const tt=t===-Infinity?null:t;
-  return{t:tt,aprox,sem,fora,pp:Math.min(10,np*PT),antec:tt==null?null:fim-tt};
+  let t=-Infinity,aprox=false,sem=false,np=0,fora=0;
+  for(const x of c){const v=noPrazo(x.e);
+    if(v==null){sem=true;continue}
+    if(v){np++;t=Math.max(t,new Date(tEv(x.e)).getTime());if(x.e&&!x.e.horario_exato&&!isCtrl(w))aprox=true}else fora++}
+  const tt=t===-Infinity?null:t,ini=encIni(TURMA[id],w);
+  return{t:tt,aprox,sem,fora,pp:Math.min(10,np*PT),rel:tt==null||ini==null?null:tt-ini};
 }
-// Critério: 1) maior pontuação lançada dentro do prazo da turma
-//           2) empate: quem completou com mais antecedência em relação ao prazo da própria turma
+// Critério: 1) maior pontuação lançada no prazo (encontro ao vivo lançado no dia do encontro)
+//           2) empate: quem completou mais cedo em relação ao dia do encontro da própria turma
 //           3) maior pontuação total na semana  4) ordem alfabética
-const aK=c=>c&&c.antec!=null?c.antec:-Infinity;
+const aK=c=>c&&c.rel!=null?c.rel:Infinity;
 function classif(w,L){
   return (L||fil()).map(s=>{const c=concl(s.id,w);return{s,p:pts(s.id,w),pp:c?c.pp:0,c}}).filter(x=>x.p>0)
-    .sort((a,b)=>b.pp-a.pp||(aK(a.c)===aK(b.c)?0:aK(a.c)>aK(b.c)?-1:1)||b.p-a.p||a.s.n.localeCompare(b.s.n));
+    .sort((a,b)=>b.pp-a.pp||(aK(a.c)===aK(b.c)?0:aK(a.c)<aK(b.c)?-1:1)||b.p-a.p||a.s.n.localeCompare(b.s.n));
 }
-const antTxt=ms=>{if(ms==null)return "";const h=Math.floor(ms/36e5),d=Math.floor(h/24),hh=h%24,m=Math.floor(ms%36e5/6e4);
-  return (d?d+"d "+hh+"h":h?h+"h "+String(m).padStart(2,"0")+"min":m+"min")+" antes do prazo"};
-const conclTxt=c=>!c?"":c.t==null?"horário não registrado":(c.aprox?"≈ ":"")+dataH(c.t)+" · "+antTxt(c.antec);
+const durTxt=ms=>{const h=Math.floor(ms/36e5),d=Math.floor(h/24),hh=h%24,m=Math.floor(ms%36e5/6e4);return d?d+"d "+hh+"h":h?h+"h "+String(m).padStart(2,"0")+"min":m+"min"};
+const relTxt=ms=>ms==null?"":ms<0?durTxt(-ms)+" antes do dia do encontro":ms<864e5?"no dia do encontro":durTxt(ms-864e5)+" depois do dia do encontro";
+const conclTxt=c=>!c?"":c.t==null?"horário não registrado":(c.aprox?"≈ ":"")+dataH(c.t)+" · "+relTxt(c.rel);
 const wStatus=w=>{const sa=semanaAtual();return w<sa?"fim":w===sa?"andamento":"futura"};
 function destaque(w){
   if(isCtrl(w)&&VENC_MANUAL[w]){const g=ST.find(x=>x.id===VENC_MANUAL[w]);if(g){const p=pts(g.id,w);
@@ -952,16 +965,16 @@ function destaque(w){
   const head=`<div class="dh"><div class="lbl">⭐ Destaque da Semana ${w} · ${wLbl(w)}</div><span class="dst ${st}">${st==="fim"?"🏆 Semana encerrada":st==="andamento"?"⏳ Semana em andamento":"🔒 Ainda não começou"}</span></div>`;
   if(!g)return `<div class="card dest vazio">${head}<div class="dvz"><div style="font-size:42px">🌱</div><div class="h2">${st==="futura"?"Em breve":"Ninguém pontuou ainda"}</div><div class="mu">${st==="futura"?`A Semana ${w} começa em ${dm(wIni(w))}.`:"O primeiro lançamento já coloca alguém na liderança."}</div></div></div>`;
   const incerto=g.c&&(g.c.t==null||g.c.aprox)&&cl[1]&&cl[1].pp===g.pp;
-  const pod=cl.slice(1,3).map((x,i)=>`<div class="dpod"><span class="dmed">${["🥈","🥉"][i]}</span>${av(x.s)}<div class="dpn"><b>${x.s.n} <span class="mu" style="font-weight:600">· ${x.s.t}</span></b><span class="mu">${fmt(x.pp)}/10 no prazo${x.p>x.pp?` (+${fmt(x.p-x.pp)} fora)`:""} · ${conclTxt(x.c)}</span></div></div>`).join("");
+  const pod=cl.slice(1,3).map((x,i)=>`<div class="dpod"><span class="dmed">${["🥈","🥉"][i]}</span>${av(x.s)}<div class="dpn"><b>${x.s.n} <span class="mu" style="font-weight:600">· ${x.s.t}</span></b><span class="mu">${fmt(x.pp)}/10 no prazo${x.p>x.pp?` (+${fmt(x.p-x.pp)} fora do prazo)`:""} · ${conclTxt(x.c)}</span></div></div>`).join("");
   const empatados=cl.filter(x=>x.pp===g.pp).length;
   return `<div class="card dest">${head}
     <div class="dwin"><div class="dav ${g.s.c}"><span class="crown">👑</span>${ini(g.s.n)}<i class="sp1">✦</i><i class="sp2">✦</i><i class="sp3">✦</i></div>
       <div class="dtag">${st==="fim"?"Ganhador(a) da semana":"Liderando agora"}</div>
       <div class="dname">${g.s.n}</div><div class="mu">${g.s.t==="Segunda"?"Turma de segunda":"Turma de sábado"}</div>
-      <div class="dstats"><span><b>${fmt(g.pp)}</b>/10 no prazo</span><span>📅 Prazo da turma: ${encLbl(g.s.t,w)}</span><span>⏱ ${g.c&&g.c.t!=null?(g.pp===10?"Completou ":"Último lançamento ")+conclTxt(g.c):"Horário não registrado"}</span></div>
+      <div class="dstats"><span><b>${fmt(g.pp)}</b>/10 no prazo</span><span>📅 Encontro da turma: ${encLbl(g.s.t,w)}</span><span>⏱ ${g.c&&g.c.t!=null?(g.pp===10?"Completou ":"Último lançamento ")+conclTxt(g.c):"Horário não registrado"}</span></div>
       <div class="dprize">🎁 ${PR[w-1]}</div></div>
     ${pod?`<div class="dpods">${pod}</div>`:""}
-    <div class="dcrit">📏 Critério: 1) maior pontuação lançada <b>dentro do prazo da turma</b> (até o dia do encontro ao vivo: ${encLbl("Sábado",w)} para sábado, ${encLbl("Segunda",w)} para segunda); 2) no empate, vence quem completou com <b>mais antecedência em relação ao prazo da própria turma</b>, assim as duas turmas competem em pé de igualdade.${empatados>1?` ${empatados} pessoas empataram com ${fmt(g.pp)}; a antecedência decidiu.`:""} Considera ${turma}.</div>
+    <div class="dcrit">📏 Critério: 1) maior pontuação <b>no prazo</b>: o “encontro ao vivo” só vale se lançado <b>no dia do encontro da turma</b> (${encLbl("Sábado",w)} para sábado, ${encLbl("Segunda",w)} para segunda); antes ou depois fica fora do prazo. 2) No empate, vence quem completou <b>mais cedo em relação ao dia do encontro da própria turma</b>, assim as duas turmas competem em pé de igualdade.${empatados>1?` ${empatados} pessoas empataram com ${fmt(g.pp)}; o horário decidiu.`:""} Considera ${turma}.</div>
     ${incerto?`<div class="dwarn">⚠️ O desempate usou horário aproximado ou não registrado (dados de antes do novo sistema). Vale conferir.</div>`:""}
     <button class="pill dcopy" data-copy="${w}">📋 Copiar texto para o WhatsApp</button></div>`;
 }
@@ -1012,13 +1025,15 @@ function vO(){
   const dias=Array.from({length:7},(_,i)=>new Date(wIni(r).getTime()+i*864e5));
   const cont=dias.map(d=>evL.filter(e=>e.marcado&&e.semana===r&&e.criado_em&&fmtD(e.criado_em,{dateStyle:"short"})===d.toLocaleDateString("pt-BR",{timeZone:"UTC",dateStyle:"short"})).length);
   const mx=Math.max(1,...cont),semHora=evL.filter(e=>e.marcado&&e.semana===r&&!e.criado_em).length;
-  // prazos por turma
-  const pzT=["Sábado","Segunda"].filter(t=>fT==="Todas"||fT===t).map(t=>{const Lt=L.filter(s=>s.t===t);let np=0,fo=0,sh=0,pes=new Set();
-    Lt.forEach(s=>contrib(s.id,r).forEach(x=>{const v=noPrazo(x.e);if(v===true)np++;else if(v===false){fo++;pes.add(s.n)}else sh++}));
-    return `<div class="pzt ${t==="Sábado"?"lav":"sky"}"><div class="pzh"><b>Turma de ${t.toLowerCase()}</b><span class="mu">encontro ${encLbl(t,r)} · prazo até 23:59</span></div>
-      <div class="pzn"><span class="sc g">${np} no prazo</span><span class="sc r">${fo} fora do prazo</span>${sh?`<span class="sc n">${sh} sem horário</span>`:""}</div>
-      ${pes.size?`<div class="mu" style="font-size:12.5px;margin-top:6px">Fora do prazo: ${[...pes].join(", ")}</div>`:""}</div>`}).join("");
-  h+=`<div class="card"><div class="lbl">Semana ${r} · ${wLbl(r)}</div><div class="h2">Prazo por turma</div><div class="mu">Cada turma tem o prazo até o dia do seu encontro ao vivo. Contagem dos lançamentos que valem na semana.</div>${pzT}</div>`;
+  // encontro ao vivo: lançado no dia certo?
+  const pzT=["Sábado","Segunda"].filter(t=>fT==="Todas"||fT===t).map(t=>{const Lt=L.filter(s=>s.t===t);const g={dia:[],antes:[],depois:[],sem:[]};
+    Lt.forEach(s=>{const x=contrib(s.id,r).find(y=>y.it==="encontro");if(!x)return;const st=x.e?encSt(x.e):null;g[st||"sem"].push(s.n)});
+    const nl=Lt.length-g.dia.length-g.antes.length-g.depois.length-g.sem.length;
+    return `<div class="pzt ${t==="Sábado"?"lav":"sky"}"><div class="pzh"><b>Turma de ${t.toLowerCase()}</b><span class="mu">encontro ${encLbl(t,r)}</span></div>
+      <div class="pzn"><span class="sc g">${g.dia.length} no dia</span><span class="sc r">${g.antes.length} antes</span><span class="sc r">${g.depois.length} depois</span>${g.sem.length?`<span class="sc n">${g.sem.length} sem horário</span>`:""}<span class="sc n">${nl} não lançaram</span></div>
+      ${g.antes.length?`<div class="mu" style="font-size:12.5px;margin-top:6px">Antes do encontro: ${g.antes.join(", ")}</div>`:""}
+      ${g.depois.length?`<div class="mu" style="font-size:12.5px;margin-top:4px">Depois do encontro: ${g.depois.join(", ")}</div>`:""}</div>`}).join("");
+  h+=`<div class="card"><div class="lbl">Semana ${r} · ${wLbl(r)}</div><div class="h2">Encontro ao vivo no prazo</div><div class="mu">“Participar do encontro ao vivo” precisa ser lançado no dia do encontro da turma. Antes ou depois fica fora do prazo.</div>${pzT}</div>`;
   h+=`<div class="card"><div class="lbl">Semana ${r} · ${wLbl(r)}</div><div class="h2">Em que dia lançam</div><div class="mu">Quantidade de lançamentos por dia</div>
     <div class="vbars days">${dias.map((d,i)=>`<div class="vb ${d.toLocaleDateString("pt-BR",{timeZone:"UTC",dateStyle:"short"})===hojeK?"cur":""} ${d.toISOString().slice(0,10)===encDia("Sábado",r)?"encS":d.toISOString().slice(0,10)===encDia("Segunda",r)?"encG":""}"><b>${cont[i]}</b><div class="t"><i style="height:${cont[i]/mx*100}%"></i></div><span class="mu">${d.toLocaleDateString("pt-BR",{timeZone:"UTC",weekday:"short"}).replace(".","")}<br>${dm(d)}</span></div>`).join("")}</div>
     <div class="mu" style="margin-top:8px;font-size:12px"><span class="encd s"></span> encontro de sábado · <span class="encd g"></span> encontro de segunda</div>
@@ -1093,7 +1108,7 @@ function vR(){
   <div class="card"><div class="lbl">${rWk==="geral"?`Ranking geral · ${compLbl} · máx. ${MAXT}`:`Ranking da semana ${rWk} · ${wLbl(rWk)} · máx. 10`}</div><div class="h2">${rWk!=="geral"&&isCtrl(rWk)?"Semana de controle":"Classificação"}</div>
   ${rWk!=="geral"&&isCtrl(rWk)?`<div class="dwarn" style="margin:8px 0">🕒 Esta semana é só para controle e <b>não vale para a competição</b>. A lista abaixo é apenas informativa.</div>`:""}
   <div class="prz ${rWk==="geral"?"butter":"peach"}">${rWk==="geral"?"🥇 1º lugar: 50% de desconto · 🥈 2º lugar: 50% para presentear alguém":"🎁 "+PR[rWk-1]}</div>
-  <div class="mu" style="margin-bottom:6px">${rWk==="geral"?"":`Ordem: maior pontuação <b>no prazo da turma</b> (sáb: até ${encLbl("Sábado",rWk)} · seg: até ${encLbl("Segunda",rWk)}); no empate, mais antecedência em relação ao próprio prazo (⏱). `}Toque em um nome para ver os lançamentos que formam a pontuação.</div><table><tr><th></th><th>Aluno</th><th class="n">Sementes</th></tr>`;
+  <div class="mu" style="margin-bottom:6px">${rWk==="geral"?"":`Ordem: maior pontuação <b>no prazo</b> (encontro ao vivo lançado no dia: sáb ${encLbl("Sábado",rWk)} · seg ${encLbl("Segunda",rWk)}); no empate, quem completou mais cedo em relação ao dia do encontro da própria turma (⏱). `}Toque em um nome para ver os lançamentos que formam a pontuação.</div><table><tr><th></th><th>Aluno</th><th class="n">Sementes</th></tr>`;
   let pos=0,last=null;
   h+=rows.map((r,i)=>{if(rWk!=="geral"){pos=r.p>0?i+1:rows.filter(x=>x.p>0).length+1;last=r.p}else if(r.p!==last){pos=i+1;last=r.p}const top=r.p>0&&pos<=3&&!(rWk!=="geral"&&isCtrl(rWk));const m=top?["🥇","🥈","🥉"][pos-1]:pos+"º";
     let t=`<tr class="${top?"p"+pos:""} clk" data-ro="${r.s.id}"><td class="pos">${m}</td><td><div class="who">${av(r.s)}<span>${r.s.n}<br><span class="mu">${r.s.t}${rWk!=="geral"&&r.c?" · ⏱ "+conclTxt(r.c):""}${rWk!=="geral"&&r.c&&r.c.fora?` · <span class="late">${r.c.fora} fora do prazo</span>`:""}</span></span></div></td><td class="n"><b class="serif" style="font-size:18px;font-weight:600">${fmt(rWk!=="geral"&&r.pp!=null?r.pp:r.p)}</b>${rWk!=="geral"&&r.pp!=null&&r.p>r.pp?`<br><span class="mu" style="font-size:11px">${fmt(r.p)} no total</span>`:""} <span class="mu">${rOpen===r.s.id?"▴":"▾"}</span></td></tr>`;
@@ -1141,13 +1156,13 @@ function listH(){
   const rows=linhasH(),soma=rows.reduce((a,x)=>a+(x.e&&!x.e.marcado?-PT:PT),0);
   const lim=hMais?rows.length:Math.min(rows.length,60);
   $("hl").innerHTML=`<div class="hsum"><div><div class="lbl">${hW==="todas"?"Todas as semanas":"Semana "+hW+" · "+wLbl(hW)}</div><div class="h2">${rows.length} lançamento${rows.length===1?"":"s"}</div><div class="mu">${hModo==="validos"?`Somam ${fmt(soma)} sementes no ranking`:"Inclui lançamentos desfeitos (−2,5)"}</div></div><button class="pill" id="hcsv" style="box-shadow:none">⬇ CSV</button></div>
-  <div class="mu legend"><b>Prazo</b> = até 23:59 do dia do encontro ao vivo da turma (sábado ou segunda). <span class="sc g">No prazo</span> <span class="sc r">Fora do prazo</span> · <span class="sc y">≈</span> horário aproximado (histórico antigo) · <span class="sc n">Sem horário</span> lançado antes do registro · <span class="sc l">controle</span> Semanas 1 e 2, pelo dia e hora informados pelo aluno</div>
+  <div class="mu legend"><b>Prazo</b>: “encontro ao vivo” precisa ser lançado <b>no dia do encontro da turma</b> (sábado ou segunda); as demais atividades, dentro da semana. <span class="sc g">No prazo</span> <span class="sc r">Antes/Depois do encontro</span> · <span class="sc y">≈</span> horário aproximado (histórico antigo) · <span class="sc n">Sem horário</span> lançado antes do registro · <span class="sc l">controle</span> Semanas 1 e 2, pelo dia e hora informados pelo aluno</div>
   ${rows.slice(0,lim).map(x=>evLine(x.s,x.it,x.e,x.w,true)).join("")||'<div class="mu" style="padding:14px 0">Nenhum lançamento com esses filtros.</div>'}
   ${rows.length>lim?`<button class="btn" id="hmais">Mostrar todos (${rows.length})</button>`:""}`;
   const m=$("hmais");if(m)m.onclick=()=>{hMais=true;listH()};
   bindEd();
-  $("hcsv").onclick=()=>baixarCSV("historico-lancamentos.csv",["Data;Hora;Dia da semana;Aluno;Turma;Semana;Período da semana;Prazo da turma (encontro);Atividade;Pontos;Situação;Horário informado pelo aluno;Observação",
-    ...rows.map(x=>{const e=x.e,c=e&&e.criado_em;return [c?fmtD(c,{day:"2-digit",month:"2-digit",year:"numeric"}):"",c?fmtD(c,{hour:"2-digit",minute:"2-digit"}):"",c?fmtD(c,{weekday:"long"}):"",x.s.n,x.s.t,x.w,wLbl(x.w),encLbl(x.s.t,x.w)+" 23:59",ITEM[x.it][1],(e&&!e.marcado?"-":"")+"2,5",sit(e)[0],e&&e.horario_informado?fmtD(e.horario_informado,{day:"2-digit",month:"2-digit",year:"numeric"})+" "+fmtD(e.horario_informado,{hour:"2-digit",minute:"2-digit"}):"",(e&&e.obs||"").replace(/;/g,",")].join(";")})]);
+  $("hcsv").onclick=()=>baixarCSV("historico-lancamentos.csv",["Data;Hora;Dia da semana;Aluno;Turma;Semana;Período da semana;Dia do encontro da turma;Atividade;Pontos;Situação;Horário informado pelo aluno;Observação",
+    ...rows.map(x=>{const e=x.e,c=e&&e.criado_em;return [c?fmtD(c,{day:"2-digit",month:"2-digit",year:"numeric"}):"",c?fmtD(c,{hour:"2-digit",minute:"2-digit"}):"",c?fmtD(c,{weekday:"long"}):"",x.s.n,x.s.t,x.w,wLbl(x.w),encLbl(x.s.t,x.w),ITEM[x.it][1],(e&&!e.marcado?"-":"")+"2,5",sit(e)[0],e&&e.horario_informado?fmtD(e.horario_informado,{day:"2-digit",month:"2-digit",year:"numeric"})+" "+fmtD(e.horario_informado,{hour:"2-digit",minute:"2-digit"}):"",(e&&e.obs||"").replace(/;/g,",")].join(";")})]);
 }
 
 
