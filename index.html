@@ -429,7 +429,7 @@ table td .who{white-space:normal}
 .chip.lav{margin-top:6px}
 .evinf{font-size:12.5px;font-weight:600;color:var(--lav-d);margin-top:2px}
 .gw.ctl{background:var(--lav-t);border-style:dashed}
-th.ctlc,td.ctlc{color:var(--mu);background:var(--soft)}
+th.ctlc,td.ctlc{background:var(--lav-t)}
 
 /* ajustes da liderança */
 .edb{margin-top:2px;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:3px 9px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--mu);white-space:nowrap}
@@ -507,14 +507,14 @@ const DIARIO=["leitura","atividade"],DIA_DESDE=3;
 const usaDias=(w,it)=>w>=DIA_DESDE&&DIARIO.includes(it);
 const LIVROS = {2:"O Poder da Cura — Randy Clark",3:"Sentindo o Abraço do Pai — Jack Frost"};
 const PR = ["Livro de até R$ 50","Kit Surpresa Tenda","Acesso à aula de quarta-feira do Módulo 2","1 entrada para o Encontro","Acesso à aula de quarta-feira do Módulo 2","Um livro complementar","Um caderno PROFÉTICO"];
-const STAGES = [[0,"🌰","Semente"],[2.5,"🌱","Broto"],[10,"🌿","Muda"],[20,"🪴","Planta jovem"],[30,"🌳","Árvore"],[42.5,"🍎","Árvore frutífera"]];
+const STAGES = [[0,"🌰","Semente"],[2.5,"🌱","Broto"],[15,"🌿","Muda"],[30,"🪴","Planta jovem"],[45,"🌳","Árvore"],[60,"🍎","Árvore frutífera"]];
 const WEMO = ["🌰","🌱","🌿","🌳","🏆"];
 const CORES = ["sage","sky","lav","peach","blush","butter"];
 /* ======================================================== */
 
 // Semanas só de controle (o aluno informa o horário; NÃO valem para a competição)
 const CTRL=[1,2];
-const W=[1,2,3,4,5,6,7],PT=2.5,COMP=W.filter(w=>!CTRL.includes(w)),MAXT=COMP.length*10;
+const W=[1,2,3,4,5,6,7],PT=2.5,COMP=W.filter(w=>!CTRL.includes(w)),MAXT=W.length*10;  // o total soma todas as semanas (1 a 7)
 const isCtrl=w=>CTRL.includes(w);
 // Cronograma dos encontros ao vivo: [turma de sábado, turma de segunda]
 // "Participar do encontro ao vivo" precisa ser lançado NO DIA do encontro da turma
@@ -526,7 +526,7 @@ const ENCONTROS={
 };
 // Vencedores das semanas de controle, definidos pela liderança
 const VENC_MANUAL={1:"seg_diogo",2:"sab_vanessa"};
-const compLbl="Semanas "+COMP[0]+" a "+COMP[COMP.length-1];
+const compLbl="Semanas "+W[0]+" a "+W[W.length-1];
 const ST=PESSOAS.map(([t,s,n],i)=>({id:t+"_"+s,n,t:t==="seg"?"Segunda":"Sábado",c:CORES[i%6]}));
 const $=id=>document.getElementById(id);
 const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"");
@@ -550,7 +550,7 @@ const diasN=(id,w,it)=>[...diasS(id,w,it)].filter(c=>c==="1").length;
 const diasLeg=(id,w,it)=>+(get(id)["dleg"+w+"_"+it]||0)===1;
 const comp=(id,w)=>nAt(id,w)===3&&+(get(id)["c"+w]||0)===1;
 const pts=(id,w)=>Math.min(10,nAt(id,w)*PT+(comp(id,w)?PT:0));
-const tot=id=>COMP.reduce((s,w)=>s+pts(id,w),0);  // só semanas da competição
+const tot=id=>W.reduce((s,w)=>s+pts(id,w),0);  // soma todas as semanas, inclusive as de controle
 const fmt=n=>Number.isInteger(n)?String(n):n.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1});
 const stage=t=>STAGES.filter(x=>x[0]<=t).pop();
 const started=id=>W.some(w=>pts(id,w)>0);
@@ -884,7 +884,7 @@ function renderAluna(){
   }else if(closed(wk)){
     h+=`<section class="card ${p===10?"full":""}"><div class="wk">${ring}
       <div style="min-width:0"><div class="lbl">Semana ${wk} · ${wLbl(wk)}</div><div class="h2">${p===10?"Semana completa! 🎉":fmt(p)+" de 10 sementes"}</div>${isCtrl(wk)?'<span class="chip lav">🕒 Semana de controle</span>':'<span class="chip blush">🔒 Semana encerrada</span>'}</div></div>${seeds}
-      <div class="tip">${isCtrl(wk)?`<b>Esta semana é só para controle e não vale para a competição</b>, que conta a partir da Semana ${COMP[0]}. Registre as atividades que você fez nesta semana com o <b>dia e a hora</b> em que fez cada uma.`:`Esta semana terminou em ${dm(wFim(wk))}, então não dá mais para lançar nela.`}${!isCtrl(wk)&&sa>=2&&sa<=7?` O que você lançar hoje conta na <b>Semana ${sa}</b>.`:""}</div>
+      <div class="tip">${isCtrl(wk)?`<b>Esta semana é de controle</b>: os pontos somam no seu total, mas o ganhador da semana foi definido pela liderança. Registre as atividades que você fez nesta semana com o <b>dia e a hora</b> em que fez cada uma.`:`Esta semana terminou em ${dm(wFim(wk))}, então não dá mais para lançar nela.`}${!isCtrl(wk)&&sa>=2&&sa<=7?` O que você lançar hoje conta na <b>Semana ${sa}</b>.`:""}</div>
       ${ACT.map((a,i)=>{const d=m[i]==="1";if(usaDias(wk,a[3]))return cardDias(a,wk,false);return `<div class="act ro ${a[2]} ${d?"done":"off"}"><span class="bub">${d?"✓":a[0]}</span><span class="tx">${a[1]}${quando(a[3])}${infBtn(a[3])}</span><span class="pt">${d?"+2,5 🌱":"0"}</span></div>`}).join("")}
       ${cs||(isCtrl(wk)&&n===3)?`<div class="act ro blush ${cs?"done":"off"}"><span class="bub">${cs?"✓":"📚"}</span><span class="tx">Leitura complementar${quando("complementar")}${infBtn("complementar")}</span><span class="pt">${cs?"+2,5 🌱":"0"}</span></div>`:""}
       ${isCtrl(wk)&&n!==3&&!cs?'<div class="mu" style="margin-top:10px">📚 A leitura complementar aparece aqui quando houver 3 das 4 atividades registradas.</div>':""}
@@ -1025,10 +1025,10 @@ function destaque(w){
       <div class="dname">${g.n}</div><div class="mu">${g.t==="Segunda"?"Turma de segunda":"Turma de sábado"}</div>
       <div class="dstats">${p?`<span><b>${fmt(p)}</b>/10 sementes</span>`:""}<span>🕒 Semana de controle</span></div>
       <div class="dprize">🎁 ${PR[w-1]}</div></div>
-    <div class="dcrit">📌 Ganhador(a) definido(a) pela liderança. A Semana ${w} é de controle: não entra no ranking geral da competição (Semanas ${COMP[0]} a ${COMP[COMP.length-1]}).</div>
+    <div class="dcrit">📌 Ganhador(a) definido(a) pela liderança. A Semana ${w} é de controle: os pontos dela somam no ranking geral.</div>
     <button class="pill dcopy" data-copy="${w}">📋 Copiar texto para o WhatsApp</button></div>`}}
   if(isCtrl(w)){const inf=fil().filter(s=>contrib(s.id,w).some(x=>x.e&&x.e.horario_informado)).length,com=fil().filter(s=>pts(s.id,w)>0).length;
-    return `<div class="card dest vazio"><div class="dh"><div class="lbl">Semana ${w} · ${wLbl(w)}</div><span class="dst futura">🕒 Semana de controle</span></div><div class="dvz"><div style="font-size:42px">🕒</div><div class="h2">Fora da competição</div><div class="mu">A competição conta a partir da Semana ${COMP[0]}. Nesta semana os alunos registram as atividades com o dia e a hora em que fizeram, só para controle.<br><b style="color:var(--tx)">${inf} de ${com}</b> pessoas com registros já informaram o dia e a hora.</div><button class="pill" data-v="H" style="margin-top:12px;box-shadow:none">Ver no histórico</button></div></div>`}
+    return `<div class="card dest vazio"><div class="dh"><div class="lbl">Semana ${w} · ${wLbl(w)}</div><span class="dst futura">🕒 Semana de controle</span></div><div class="dvz"><div style="font-size:42px">🕒</div><div class="h2">Semana de controle</div><div class="mu">Os pontos desta semana somam no ranking geral. Nesta semana os alunos registram as atividades com o dia e a hora em que fizeram, só para controle.<br><b style="color:var(--tx)">${inf} de ${com}</b> pessoas com registros já informaram o dia e a hora.</div><button class="pill" data-v="H" style="margin-top:12px;box-shadow:none">Ver no histórico</button></div></div>`}
   const cl=classif(w),st=wStatus(w),g=cl[0],turma=fT==="Todas"?"todas as turmas":"turma de "+fT.toLowerCase();
   const head=`<div class="dh"><div class="lbl">⭐ Destaque da Semana ${w} · ${wLbl(w)}</div><span class="dst ${st}">${st==="fim"?"🏆 Semana encerrada":st==="andamento"?"⏳ Semana em andamento":"🔒 Ainda não começou"}</span></div>`;
   if(!g)return `<div class="card dest vazio">${head}<div class="dvz"><div style="font-size:42px">🌱</div><div class="h2">${st==="futura"?"Em breve":"Ninguém pontuou ainda"}</div><div class="mu">${st==="futura"?`A Semana ${w} começa em ${dm(wIni(w))}.`:"O primeiro lançamento já coloca alguém na liderança."}</div></div></div>`;
@@ -1170,11 +1170,11 @@ function vR(){
   bindL=()=>{
     document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{rWk=b.dataset.k==="geral"?"geral":+b.dataset.k;rOpen=null;render()});
     document.querySelectorAll("[data-ro]").forEach(b=>b.onclick=()=>{rOpen=rOpen===b.dataset.ro?null:b.dataset.ro;edOpen=null;render()});
-    const c=$("csv");if(c)c.onclick=()=>baixarCSV("ranking-sementes.csv",["Aluno;Turma;"+W.map(w=>"S"+w+(isCtrl(w)?" (controle)":"")).join(";")+";Total competição",...rows.map(r=>[r.s.n,r.s.t,...W.map(w=>csvN(pts(r.s.id,w))),csvN(r.p)].join(";"))]);
+    const c=$("csv");if(c)c.onclick=()=>baixarCSV("ranking-sementes.csv",["Aluno;Turma;"+W.map(w=>"S"+w+(isCtrl(w)?" (controle)":"")).join(";")+";Total",...rows.map(r=>[r.s.n,r.s.t,...W.map(w=>csvN(pts(r.s.id,w))),csvN(r.p)].join(";"))]);
   };
   let h=`<div class="chips">${["geral",...W].map(w=>`<button data-k="${w}" class="${w==rWk?"on":""}">${w==="geral"?"🏆 Geral":"Semana "+w+(isCtrl(w)?" 🕒":"")}</button>`).join("")}</div>
   <div class="card"><div class="lbl">${rWk==="geral"?`Ranking geral · ${compLbl} · máx. ${MAXT}`:`Ranking da semana ${rWk} · ${wLbl(rWk)} · máx. 10`}</div><div class="h2">${rWk!=="geral"&&isCtrl(rWk)?"Semana de controle":"Classificação"}</div>
-  ${rWk!=="geral"&&isCtrl(rWk)?`<div class="dwarn" style="margin:8px 0">🕒 Esta semana é só para controle e <b>não vale para a competição</b>. A lista abaixo é apenas informativa.</div>`:""}
+  ${rWk!=="geral"&&isCtrl(rWk)?`<div class="dwarn" style="margin:8px 0">🕒 Semana de controle: os pontos somam no ranking geral; o ganhador da semana foi definido pela liderança.</div>`:""}
   <div class="prz ${rWk==="geral"?"butter":"peach"}">${rWk==="geral"?"🥇 1º lugar: 50% de desconto · 🥈 2º lugar: 50% para presentear alguém":"🎁 "+PR[rWk-1]}</div>
   <div class="mu" style="margin-bottom:6px">${rWk==="geral"?"":`Ordem: maior pontuação <b>no prazo</b> (encontro ao vivo lançado no dia: sáb ${encLbl("Sábado",rWk)} · seg ${encLbl("Segunda",rWk)}); no empate, quem completou mais cedo em relação ao dia do encontro da própria turma (⏱). `}Toque em um nome para ver os lançamentos que formam a pontuação.</div><table><tr><th></th><th>Aluno</th><th class="n">Sementes</th></tr>`;
   let pos=0,last=null;
@@ -1187,7 +1187,7 @@ function vR(){
     }
     return t}).join("");
   h+="</table></div>";
-  if(rWk==="geral")h+=`<div class="card"><div class="lbl">Consolidação</div><div class="h2">Sementes por semana</div><div class="mu">🕒 S${CTRL.join(" e S")}: semanas de controle, não entram no total.</div><div class="scroll"><table><tr><th>Aluno</th>${W.map(w=>`<th class="n ${isCtrl(w)?"ctlc":""}">S${w}${isCtrl(w)?"🕒":""}</th>`).join("")}<th class="n">Total</th></tr>${rows.map(r=>`<tr><td>${r.s.n}</td>${W.map(w=>`<td class="n ${isCtrl(w)?"ctlc":""}">${fmt(pts(r.s.id,w))}</td>`).join("")}<td class="n"><b>${fmt(r.p)}</b></td></tr>`).join("")}</table></div>
+  if(rWk==="geral")h+=`<div class="card"><div class="lbl">Consolidação</div><div class="h2">Sementes por semana</div><div class="mu">🕒 S${CTRL.join(" e S")}: semanas de controle (somam no total).</div><div class="scroll"><table><tr><th>Aluno</th>${W.map(w=>`<th class="n ${isCtrl(w)?"ctlc":""}">S${w}${isCtrl(w)?"🕒":""}</th>`).join("")}<th class="n">Total</th></tr>${rows.map(r=>`<tr><td>${r.s.n}</td>${W.map(w=>`<td class="n ${isCtrl(w)?"ctlc":""}">${fmt(pts(r.s.id,w))}</td>`).join("")}<td class="n"><b>${fmt(r.p)}</b></td></tr>`).join("")}</table></div>
     <button class="btn" id="csv">Baixar planilha (CSV para Excel)</button></div>`;
   return h;
 }
